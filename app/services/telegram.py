@@ -1,12 +1,12 @@
 import asyncio
+import logging
 from typing import Dict, Any, Optional
 from telegram import Bot
 from telegram.error import TelegramError
-import structlog
 
 from app.core.config import settings
 
-logger = structlog.get_logger()
+logger = logging.getLogger(__name__)
 
 
 class TelegramService:
@@ -15,11 +15,27 @@ class TelegramService:
     def __init__(self):
         self.bot_token = settings.telegram_bot_token
         self.chat_id = settings.telegram_chat_id
-        self.bot = Bot(token=self.bot_token)
+        self._bot = None
+    
+    @property
+    def bot(self):
+        """Lazy initialization do bot Telegram"""
+        if self._bot is None and self.bot_token:
+            self._bot = Bot(token=self.bot_token)
+        return self._bot
         
     async def send_alert(self, alert_data: Dict[str, Any]) -> bool:
         """Envia um alerta via Telegram"""
         try:
+            # Verificar se configuração está válida
+            if not self.bot_token or not self.chat_id:
+                logger.warning("Telegram bot token ou chat_id não configurados")
+                return False
+                
+            if not self.bot:
+                logger.error("Falha ao inicializar bot Telegram")
+                return False
+            
             message = self._format_alert_message(alert_data)
             
             await self.bot.send_message(
@@ -29,16 +45,14 @@ class TelegramService:
                 disable_web_page_preview=True
             )
             
-            logger.info("Telegram alert sent", 
-                       alert_type=alert_data.get("alert_type"),
-                       severity=alert_data.get("severity"))
+            logger.info(f"Telegram alert sent - Type: {alert_data.get('alert_type')}, Severity: {alert_data.get('severity')}")
             return True
             
         except TelegramError as e:
-            logger.error("Failed to send Telegram alert", error=str(e))
+            logger.error(f"Failed to send Telegram alert: {str(e)}")
             return False
         except Exception as e:
-            logger.error("Unexpected error sending Telegram alert", error=str(e))
+            logger.error(f"Unexpected error sending Telegram alert: {str(e)}")
             return False
     
     async def send_status_update(self, component: str, status: str, details: Optional[str] = None) -> bool:
@@ -69,7 +83,7 @@ class TelegramService:
             return True
             
         except Exception as e:
-            logger.error("Failed to send status update", error=str(e))
+            logger.error(f"Failed to send status update: {str(e)}")
             return False
     
     async def send_daily_report(self, report_data: Dict[str, Any]) -> bool:
@@ -87,7 +101,7 @@ class TelegramService:
             return True
             
         except Exception as e:
-            logger.error("Failed to send daily report", error=str(e))
+            logger.error(f"Failed to send daily report: {str(e)}")
             return False
     
     def _format_alert_message(self, alert_data: Dict[str, Any]) -> str:
@@ -182,7 +196,7 @@ class TelegramService:
             )
             return True
         except Exception as e:
-            logger.error("Telegram connection test failed", error=str(e))
+            logger.error(f"Telegram connection test failed: {str(e)}")
             return False
 
 

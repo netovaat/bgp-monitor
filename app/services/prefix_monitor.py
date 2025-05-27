@@ -1,14 +1,14 @@
 import asyncio
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-import structlog
+import logging
 
 from app.services.ripe_api import ripe_api
 from app.services.telegram import telegram_service
 from app.core.config import settings
 from app.utils.metrics import metrics
 
-logger = structlog.get_logger()
+logger = logging.getLogger(__name__)
 
 
 class PrefixMonitor:
@@ -30,7 +30,7 @@ class PrefixMonitor:
             "is_active": True
         }
         self.monitored_prefixes.append(prefix_data)
-        logger.info("Added prefix to monitoring", prefix=prefix)
+        logger.info(f"Added prefix to monitoring: {prefix}")
         
     def remove_monitored_prefix(self, prefix: str):
         """Remove um prefixo do monitoramento"""
@@ -38,7 +38,7 @@ class PrefixMonitor:
             p for p in self.monitored_prefixes 
             if p["prefix"] != prefix
         ]
-        logger.info("Removed prefix from monitoring", prefix=prefix)
+        logger.info(f"Removed prefix from monitoring: {prefix}")
         
     def get_monitored_prefixes(self) -> List[Dict[str, Any]]:
         """Retorna lista de prefixos monitorados"""
@@ -53,7 +53,7 @@ class PrefixMonitor:
                 logger.info("No prefixes configured for monitoring")
                 return alerts
                 
-            logger.info("Checking prefix announcements", count=len(self.monitored_prefixes))
+            logger.info(f"Checking prefix announcements (count: {len(self.monitored_prefixes)})")
             
             # Busca prefixos atualmente anunciados
             announced_prefixes = await ripe_api.get_announced_prefixes(self.target_asn)
@@ -91,14 +91,14 @@ class PrefixMonitor:
                         # Atualiza métricas
                         metrics.increment_alert_counter("prefix_missing")
                         
-                        logger.warning("Missing prefix detected", prefix=prefix, asn=self.target_asn)
+                        logger.warning(f"Missing prefix detected: {prefix} (ASN: {self.target_asn})")
                 else:
                     # Prefixo está sendo anunciado - limpa alertas
                     self._clear_alert("prefix_missing", prefix)
-                    logger.debug("Prefix announcement confirmed", prefix=prefix)
+                    logger.debug(f"Prefix announcement confirmed: {prefix}")
                     
         except Exception as e:
-            logger.error("Error checking prefix announcements", error=str(e))
+            logger.error(f"Error checking prefix announcements: {str(e)}")
             metrics.update_component_health("prefix_monitor", False)
             raise
             

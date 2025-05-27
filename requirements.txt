@@ -2,23 +2,21 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 pydantic==2.5.0
-pydantic-settings==2.1.0
 
 # HTTP client
 httpx==0.25.2
-aiohttp==3.9.1
 
-# Telegram
+# Telegram Bot
 python-telegram-bot==20.7
 
-# Task scheduling (replacing Celery)
+# Utilities
+python-dotenv==1.0.0
+python-dateutil==2.8.2
 schedule==1.2.0
 
-# Utilities
-structlog==23.2.0
-python-dotenv==1.0.0
-ipaddress==1.0.23
-python-dateutil==2.8.2
+# Data processing
+pandas==2.0.3
+numpy==1.24.4
 click==8.1.7
 rich==13.7.0
 

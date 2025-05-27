@@ -8,14 +8,14 @@ from datetime import datetime
 from app.core.config import settings
 from app.services.telegram import telegram_service
 from app.utils.metrics import metrics
-import structlog
+import logging
 
-logger = structlog.get_logger()
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="BGP Monitor API",
     description="API para monitoramento BGP com alertas via Telegram",
-    version="1.0.0"
+    version="1.0.1"
 )
 
 # CORS
@@ -36,7 +36,7 @@ async def root():
     """Endpoint raiz com informações básicas"""
     return {
         "service": "BGP Monitor",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "status": "running",
         "target_asn": settings.target_asn,
         "uptime": int(time.time() - metrics.start_time)
@@ -85,7 +85,7 @@ async def add_monitored_prefix(prefix_data: Dict[str, Any]):
         monitored_prefixes.append(new_prefix)
         
         # Log da adição
-        logger.info("Prefix added", prefix=new_prefix["prefix"], asn=new_prefix["asn"])
+        logger.info(f"Prefix added: {new_prefix['prefix']} (ASN: {new_prefix['asn']})")
         
         return new_prefix
         
@@ -116,7 +116,7 @@ async def remove_monitored_prefix(prefix_id: int):
     
     removed_prefix = monitored_prefixes.pop(prefix_index)
     
-    logger.info("Prefix removed", prefix=removed_prefix["prefix"], asn=removed_prefix["asn"])
+    logger.info(f"Prefix removed: {removed_prefix['prefix']} (ASN: {removed_prefix['asn']})")
     
     return {"message": f"Prefixo {removed_prefix['prefix']} removido com sucesso"}
 
@@ -144,7 +144,7 @@ async def test_telegram():
         )
         return {"status": "success", "message": "Mensagem enviada com sucesso"}
     except Exception as e:
-        logger.error("Telegram test failed", error=str(e))
+        logger.error(f"Telegram test failed: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Erro ao enviar mensagem: {str(e)}"
@@ -166,7 +166,7 @@ async def run_manual_checks():
         duration = time.time() - start_time
         metrics.record_check_duration("manual_check", duration)
         
-        logger.info("Manual checks completed", duration=duration)
+        logger.info(f"Manual checks completed (duration: {duration:.2f}s)")
         
         return {
             "status": "completed",
@@ -180,7 +180,7 @@ async def run_manual_checks():
         }
         
     except Exception as e:
-        logger.error("Manual checks failed", error=str(e))
+        logger.error(f"Manual checks failed: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Erro nas verificações: {str(e)}"

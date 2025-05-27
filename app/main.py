@@ -5,20 +5,22 @@ BGP Monitor - Sistema simplificado de monitoramento BGP
 import asyncio
 import signal
 import sys
+import logging
 
 from app.api.main import app
 from app.scheduler import bgp_scheduler
 from app.core.config import settings
-import structlog
 
-logger = structlog.get_logger()
+# Configurar logging simples
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 # Configurar lifespan events do FastAPI
 @app.on_event("startup")
 async def startup_event():
     """Evento de inicialização"""
-    logger.info("Starting BGP Monitor", version="1.0.0", target_asn=settings.target_asn)
+    logger.info(f"Starting BGP Monitor v1.0.1 - Target ASN: {settings.target_asn}")
     bgp_scheduler.start()
 
 @app.on_event("shutdown")
@@ -30,7 +32,7 @@ async def shutdown_event():
 
 def signal_handler(signum, frame):
     """Handler para sinais do sistema"""
-    logger.info("Received signal", signal=signum)
+    logger.info(f"Received signal: {signum}")
     bgp_scheduler.stop()
     sys.exit(0)
 
@@ -44,7 +46,7 @@ def main():
     # Iniciar aplicação
     import uvicorn
     
-    logger.info("Starting server", host=settings.host, port=settings.port)
+    logger.info(f"Starting server on {settings.host}:{settings.port}")
     
     uvicorn.run(
         "app.main:app",

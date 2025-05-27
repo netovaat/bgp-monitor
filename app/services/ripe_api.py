@@ -2,10 +2,10 @@ import httpx
 import asyncio
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-import structlog
+import logging
 from app.core.config import settings
 
-logger = structlog.get_logger()
+logger = logging.getLogger(__name__)
 
 
 class RIPEStatAPI:
@@ -28,7 +28,7 @@ class RIPEStatAPI:
                 response.raise_for_status()
                 return response.json()
             except httpx.HTTPError as e:
-                logger.error("RIPE API request failed", endpoint=endpoint, error=str(e))
+                logger.error(f"RIPE API request failed - endpoint: {endpoint}, error: {str(e)}")
                 raise
     
     async def get_announced_prefixes(self, asn: int) -> List[Dict[str, Any]]:

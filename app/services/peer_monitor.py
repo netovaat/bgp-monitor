@@ -1,14 +1,14 @@
 import asyncio
 from typing import List, Dict, Any, Set
 from datetime import datetime, timedelta
-import structlog
+import logging
 
 from app.services.ripe_api import ripe_api
 from app.services.telegram import telegram_service
 from app.core.config import settings
 from app.utils.metrics import metrics
 
-logger = structlog.get_logger()
+logger = logging.getLogger(__name__)
 
 
 class PeerMonitor:
@@ -106,7 +106,7 @@ class PeerMonitor:
                 self._clear_alert("insufficient_upstreams", "global")
                 
         except Exception as e:
-            logger.error("Error checking peer relationships", error=str(e))
+            logger.error(f"Error checking peer relationships: {str(e)}")
             metrics.update_component_health("peer_monitor", False)
             raise
             
@@ -158,7 +158,7 @@ class PeerMonitor:
                 metrics.record_latency_measurement(peer["asn"], simulated_latency)
                 
         except Exception as e:
-            logger.error("Error measuring latencies", error=str(e))
+            logger.error(f"Error measuring latencies: {str(e)}")
             
         return alerts
     

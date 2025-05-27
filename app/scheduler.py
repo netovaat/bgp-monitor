@@ -11,9 +11,9 @@ from app.services.prefix_monitor import prefix_monitor
 from app.services.peer_monitor import peer_monitor
 from app.services.irr_validator import irr_validator
 from app.utils.metrics import metrics
-import structlog
+import logging
 
-logger = structlog.get_logger()
+logger = logging.getLogger(__name__)
 
 
 class BGPScheduler:
@@ -79,7 +79,7 @@ class BGPScheduler:
             metrics.record_check_duration("prefix_announcements", duration)
             
         except Exception as e:
-            logger.error("Prefix check failed", error=str(e))
+            logger.error(f"Prefix check failed: {str(e)}")
             metrics.update_component_health("prefix_monitor", False)
     
     async def _async_prefix_check(self):
@@ -87,10 +87,10 @@ class BGPScheduler:
         try:
             alerts = await prefix_monitor.check_prefix_announcements()
             if alerts:
-                logger.info("Prefix alerts generated", count=len(alerts))
+                logger.info(f"Prefix alerts generated (count: {len(alerts)})")
             metrics.update_component_health("prefix_monitor", True)
         except Exception as e:
-            logger.error("Async prefix check failed", error=str(e))
+            logger.error(f"Async prefix check failed: {str(e)}")
             metrics.update_component_health("prefix_monitor", False)
     
     def _run_peer_check(self):
@@ -109,7 +109,7 @@ class BGPScheduler:
             metrics.record_check_duration("peer_relationships", duration)
             
         except Exception as e:
-            logger.error("Peer check failed", error=str(e))
+            logger.error(f"Peer check failed: {str(e)}")
             metrics.update_component_health("peer_monitor", False)
     
     async def _async_peer_check(self):
@@ -117,10 +117,10 @@ class BGPScheduler:
         try:
             alerts = await peer_monitor.check_peer_relationships()
             if alerts:
-                logger.info("Peer alerts generated", count=len(alerts))
+                logger.info(f"Peer alerts generated (count: {len(alerts)})")
             metrics.update_component_health("peer_monitor", True)
         except Exception as e:
-            logger.error("Async peer check failed", error=str(e))
+            logger.error(f"Async peer check failed: {str(e)}")
             metrics.update_component_health("peer_monitor", False)
     
     def _run_latency_check(self):
@@ -139,16 +139,16 @@ class BGPScheduler:
             metrics.record_check_duration("latency_measurements", duration)
             
         except Exception as e:
-            logger.error("Latency check failed", error=str(e))
+            logger.error(f"Latency check failed: {str(e)}")
     
     async def _async_latency_check(self):
         """Verificação assíncrona de latência"""
         try:
             alerts = await peer_monitor.measure_latency()
             if alerts:
-                logger.info("Latency alerts generated", count=len(alerts))
+                logger.info(f"Latency alerts generated (count: {len(alerts)})")
         except Exception as e:
-            logger.error("Async latency check failed", error=str(e))
+            logger.error(f"Async latency check failed: {str(e)}")
     
     def _run_irr_check(self):
         """Executa verificação IRR"""
@@ -166,7 +166,7 @@ class BGPScheduler:
             metrics.record_check_duration("irr_validation", duration)
             
         except Exception as e:
-            logger.error("IRR check failed", error=str(e))
+            logger.error(f"IRR check failed: {str(e)}")
     
     async def _async_irr_check(self):
         """Verificação assíncrona de IRR"""
@@ -174,9 +174,9 @@ class BGPScheduler:
             monitored_prefixes = prefix_monitor.get_monitored_prefixes()
             alerts = await irr_validator.validate_all_monitored_prefixes(monitored_prefixes)
             if alerts:
-                logger.info("IRR alerts generated", count=len(alerts))
+                logger.info(f"IRR alerts generated (count: {len(alerts)})")
         except Exception as e:
-            logger.error("Async IRR check failed", error=str(e))
+            logger.error(f"Async IRR check failed: {str(e)}")
     
     def _run_health_check(self):
         """Executa verificação de saúde do sistema"""
@@ -190,7 +190,7 @@ class BGPScheduler:
                 ).result(timeout=60)
             
         except Exception as e:
-            logger.error("Health check failed", error=str(e))
+            logger.error(f"Health check failed: {str(e)}")
     
     async def _async_health_check(self):
         """Verificação assíncrona de saúde"""
@@ -219,7 +219,7 @@ class BGPScheduler:
             logger.info("Health check completed")
             
         except Exception as e:
-            logger.error("Async health check failed", error=str(e))
+            logger.error(f"Async health check failed: {str(e)}")
     
     def _send_daily_report(self):
         """Envia relatório diário"""
@@ -232,7 +232,7 @@ class BGPScheduler:
                 ).result(timeout=120)
             
         except Exception as e:
-            logger.error("Daily report failed", error=str(e))
+            logger.error(f"Daily report failed: {str(e)}")
     
     async def _async_daily_report(self):
         """Envia relatório diário assíncrono"""
@@ -274,7 +274,7 @@ Data: {datetime.now().strftime('%d/%m/%Y %H:%M')}"""
             logger.info("Daily report sent successfully")
             
         except Exception as e:
-            logger.error("Failed to send daily report", error=str(e))
+            logger.error(f"Failed to send daily report: {str(e)}")
 
 
 # Instância global do scheduler

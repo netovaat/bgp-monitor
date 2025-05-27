@@ -1,49 +1,102 @@
 # 📦 Guia de Instalação
 
-Este guia detalha todos os métodos de instalação do BGP Monitor v1.0.
+Este guia detalha todos os métodos de instalação do BGP Monitor v1.0.1.
 
 ## 📋 Pré-requisitos
 
 ### Sistema Operacional
-- **Linux** (Ubuntu 18.04+, CentOS 7+, Debian 9+)
-- **macOS** 10.14+
-- **Windows** 10+ (via WSL recomendado)
+- **Linux** (Ubuntu 20.04+, CentOS 8+, Debian 10+)
+- **macOS** 11.0+
+- **Windows** 10+ (via WSL2 recomendado)
 
-### Software
-- **Python 3.8 ou superior**
-- **pip** (gerenciador de pacotes Python)
+### Software Obrigatório
+- **Python 3.10 ou superior**
+- **pip3** (gerenciador de pacotes Python)
 - **git** (para clonagem do repositório)
+- **build-essential** (compiladores para dependências)
+
+### Software Opcional
 - **curl** (para testes da API)
+- **systemd** (para executar como serviço)
 
-## 🚀 Instalação Automática (Recomendada)
+## 🚀 Instalação Completa (Recomendada)
 
-### 1. Clone o Repositório
+### 1. Preparação do Sistema
 
+#### Ubuntu/Debian:
 ```bash
-git clone https://github.com/seu-usuario/bgp-monitor.git
-cd bgp-monitor
+# Atualizar sistema
+sudo apt update && sudo apt upgrade -y
+
+# Instalar dependências do sistema
+sudo apt install -y python3 python3-pip python3-venv git build-essential curl wget
+
+# Verificar versão do Python
+python3 --version  # Deve ser 3.10+
 ```
 
-### 2. Execute o Script de Instalação
-
+#### CentOS/RHEL/Fedora:
 ```bash
-# Torna o script executável
-chmod +x install.sh
+# Atualizar sistema
+sudo dnf update -y
 
-# Executa a instalação
-./install.sh
+# Instalar dependências
+sudo dnf install -y python3 python3-pip git gcc gcc-c++ curl wget
+
+# Verificar versão
+python3 --version
 ```
 
-O script irá:
-- Verificar dependências
-- Instalar pacotes Python
-- Configurar ambiente
-- Criar arquivos de configuração
-- Testar a instalação
+### 2. Instalação do BGP Monitor
 
-## 🔧 Instalação Manual
+```bash
+# Criar diretório (opcional)
+sudo mkdir -p /opt/bgp-monitor
+cd /opt/bgp-monitor
 
-### 1. Verificar Python
+# Clonar repositório
+git clone https://github.com/seu-usuario/bgp-monitor.git .
+
+# Instalar dependências Python
+pip3 install -r requirements.txt
+
+# Verificar instalação das dependências
+python3 -c "
+import fastapi, uvicorn, httpx, telegram, schedule, pandas
+print('✅ Todas as dependências instaladas com sucesso!')
+"
+```
+
+### 3. Configuração Inicial
+
+```bash
+# Copiar arquivo de configuração
+cp .env.example .env
+
+# Editar configurações (usar seu editor preferido)
+nano .env
+# ou
+vim .env
+
+# Tornar scripts executáveis
+chmod +x run.sh bgp-monitor.sh
+```
+
+### 4. Verificação da Instalação
+
+```bash
+# Testar importações
+python3 -c "
+from app.core.config import settings
+from app.main import app
+print('✅ BGP Monitor instalado corretamente!')
+print(f'🎯 ASN configurado: {settings.target_asn}')
+"
+```
+
+## 🔧 Instalação Manual Detalhada
+
+### 1. Verificar Requisitos do Sistema
 
 ```bash
 python3 --version
@@ -134,7 +187,7 @@ docker run -d \
 # Testar importações principais
 python3 -c "
 import fastapi
-import structlog
+import logging
 import httpx
 import pandas
 print('✅ Todas as dependências OK')

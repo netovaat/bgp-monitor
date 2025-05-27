@@ -1,4 +1,4 @@
-# BGP Monitor v1.0
+# BGP Monitor v1.0.1
 
 Sistema simplificado de monitoramento BGP com notificações via Telegram.
 
@@ -17,33 +17,71 @@ O BGP Monitor é uma ferramenta leve e autônoma para monitoramento de infraestr
 
 - ✅ **Zero dependências externas** - Sem Docker, bancos de dados ou Redis
 - ✅ **Leve e rápido** - Armazenamento em memória
-- ✅ **Fácil instalação** - Apenas Python 3.8+ e pip
+- ✅ **Fácil instalação** - Apenas Python 3.10+ e dependências Python
 - ✅ **Configuração simples** - Arquivo .env único
 - ✅ **Altamente confiável** - Menos componentes = menos falhas
 - ✅ **Scheduler automático** - Verificações periódicas automáticas
 
 ## 📋 Requisitos
 
-- Python 3.8 ou superior
+### Sistema Operacional
+- Linux (Ubuntu 20.04+ recomendado)
+- Python 3.10 ou superior
+- Git para instalação
 - Acesso à internet para consultas RIPE API
-- Bot do Telegram (opcional, mas recomendado)
 
-## 🚀 Instalação Rápida
+### Dependências Opcionais
+- Bot do Telegram (recomendado para alertas)
+- Curl (para testes da API)
 
+## 🚀 Instalação Completa
+
+### 1. Preparação do Sistema
 ```bash
-# 1. Clone o repositório
+# Atualizar sistema (Ubuntu/Debian)
+sudo apt update && sudo apt upgrade -y
+
+# Instalar dependências do sistema
+sudo apt install -y python3 python3-pip python3-venv git build-essential curl
+
+# Verificar versão do Python (deve ser 3.10+)
+python3 --version
+```
+
+### 2. Instalação do BGP Monitor
+```bash
+# Clonar repositório
 git clone https://github.com/seu-usuario/bgp-monitor.git
 cd bgp-monitor
 
-# 2. Instale as dependências
-pip install -r requirements.txt
+# Instalar dependências Python
+pip3 install -r requirements.txt
 
-# 3. Configure o ambiente
+# Configurar ambiente
 cp .env.example .env
-# Edite o .env com suas configurações
+nano .env  # Editar configurações
 
-# 4. Execute o sistema
+# Tornar scripts executáveis
+chmod +x run.sh bgp-monitor.sh
+```
+
+### 3. Configuração Básica
+```bash
+# Editar arquivo .env com suas configurações:
+# TARGET_ASN=65001          # Seu ASN
+# HOST=0.0.0.0             # IP da API
+# PORT=8000                # Porta da API
+# TELEGRAM_BOT_TOKEN=...   # Token do bot (opcional)
+# TELEGRAM_CHAT_ID=...     # ID do chat (opcional)
+```
+
+### 4. Execução
+```bash
+# Executar em foreground (desenvolvimento)
 ./run.sh
+
+# Ou executar em background (produção)
+./bgp-monitor.sh start
 ```
 
 ## 📖 Documentação Completa

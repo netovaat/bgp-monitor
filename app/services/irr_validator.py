@@ -2,13 +2,13 @@ import asyncio
 import httpx
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-import structlog
+import logging
 
 from app.services.telegram import telegram_service
 from app.core.config import settings
 from app.utils.metrics import metrics
 
-logger = structlog.get_logger()
+logger = logging.getLogger(__name__)
 
 
 class IRRValidationService:
@@ -46,7 +46,7 @@ class IRRValidationService:
             return validation_results
             
         except Exception as e:
-            logger.error("IRR validation failed", prefix=prefix, origin_asn=origin_asn, error=str(e))
+            logger.error(f"IRR validation failed - prefix: {prefix}, origin_asn: {origin_asn}, error: {str(e)}")
             return {}
     
     async def validate_all_monitored_prefixes(self, monitored_prefixes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -75,7 +75,7 @@ class IRRValidationService:
                     alerts.append(alert)
                     
             except Exception as e:
-                logger.error("Error validating prefix", prefix=prefix, error=str(e))
+                logger.error(f"Error validating prefix: {prefix}, error: {str(e)}")
                 
         return alerts
     
@@ -83,7 +83,7 @@ class IRRValidationService:
         """Verifica um prefixo específico em um banco IRR"""
         try:
             # Simulação de verificação IRR - em produção usaria APIs específicas de cada IRR
-            logger.debug("Checking IRR database", prefix=prefix, origin_asn=origin_asn, irr_db=irr_db)
+            logger.debug(f"Checking IRR database - prefix: {prefix}, origin_asn: {origin_asn}, irr_db: {irr_db}")
             
             # Para fins de demonstração, retorna resultados simulados
             # Em produção, isso faria consultas reais aos bancos IRR
@@ -104,7 +104,7 @@ class IRRValidationService:
             return simulated_result
             
         except Exception as e:
-            logger.error("IRR database check failed", irr_db=irr_db, error=str(e))
+            logger.error(f"IRR database check failed - irr_db: {irr_db}, error: {str(e)}")
             return {
                 "valid": False,
                 "database": irr_db,
