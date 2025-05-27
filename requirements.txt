@@ -1,0 +1,38 @@
+# Core framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# HTTP client
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Telegram
+python-telegram-bot==20.7
+
+# Task scheduling (replacing Celery)
+schedule==1.2.0
+
+# Utilities
+structlog==23.2.0
+python-dotenv==1.0.0
+ipaddress==1.0.23
+python-dateutil==2.8.2
+click==8.1.7
+rich==13.7.0
+
+# Production dependencies
+gunicorn==21.2.0
+sentry-sdk[fastapi]==1.38.0
+
+# Security
+cryptography>=41.0.7
+
+# Validation
+email-validator==2.1.0
+validators==0.22.0
+
+# Data processing
+pandas==2.0.3
+numpy==1.24.4
