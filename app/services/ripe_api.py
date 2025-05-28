@@ -17,7 +17,7 @@ class RIPEStatAPI:
         
     async def _make_request(self, endpoint: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Faz uma requisição para a API do RIPE Stat"""
-        url = f"{self.base_url}/{endpoint}"
+        url = f"{self.base_url}/{endpoint}/data.json"
         
         if settings.ripe_api_key:
             params["api_key"] = settings.ripe_api_key
@@ -28,7 +28,7 @@ class RIPEStatAPI:
                 response.raise_for_status()
                 return response.json()
             except httpx.HTTPError as e:
-                logger.error(f"RIPE API request failed - endpoint: {endpoint}, error: {str(e)}")
+                logger.error(f"RIPE API request failed - endpoint: {endpoint}, url: {url}, error: {str(e)}")
                 raise
     
     async def get_announced_prefixes(self, asn: int) -> List[Dict[str, Any]]:
@@ -80,6 +80,27 @@ class RIPEStatAPI:
             raise Exception(f"RIPE API error: {data.get('status_code')}")
             
         return data.get("data", {})
+    
+    async def get_as_info(self, asn: int) -> Dict[str, Any]:
+        """Obtém informações básicas sobre um ASN"""
+        params = {"resource": f"AS{asn}"}
+        data = await self._make_request("as-overview", params)
+        
+        if data.get("status") != "ok":
+            raise Exception(f"RIPE API error: {data.get('status_code')}")
+            
+        return data.get("data", {})
+    
+    async def get_prefixes(self, asn: int) -> List[str]:
+        """Obtém lista de prefixos anunciados por um ASN"""
+        prefixes_data = await self.get_announced_prefixes(asn)
+        return [prefix_info["prefix"] for prefix_info in prefixes_data]
+    
+    async def get_peers(self, asn: int) -> List[int]:
+        """Obtém lista de peers de um ASN"""
+        neighbours_data = await self.get_asn_neighbours(asn)
+        neighbours = neighbours_data.get("neighbours", [])
+        return [neighbour["asn"] for neighbour in neighbours]
     
     async def get_atlas_measurements(self, target: str, probe_ids: List[int] = None) -> List[Dict[str, Any]]:
         """Obtém medições do RIPE Atlas para um alvo"""

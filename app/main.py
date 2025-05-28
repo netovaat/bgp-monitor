@@ -20,14 +20,20 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_event():
     """Evento de inicialização"""
-    logger.info(f"Starting BGP Monitor v1.0.1 - Target ASN: {settings.target_asn}")
+    logger.info(f"Starting BGP Monitor v2.0.0 - Target ASN: {settings.target_asn}")
+    
+    # Inicializar banco de dados e scheduler
+    await bgp_scheduler.initialize()
     bgp_scheduler.start()
+    
+    logger.info("BGP Monitor started with historical data collection enabled")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Evento de finalização"""
     logger.info("Shutting down BGP Monitor")
     bgp_scheduler.stop()
+    await bgp_scheduler.cleanup()
 
 
 def signal_handler(signum, frame):

@@ -1,36 +1,59 @@
-# Core framework
+# BGP Monitor v2.0 - Dependências Python
+# Para instalar: pip install -r requirements.txt
+
+# Framework Web Assíncrono
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-pydantic==2.5.0
 
-# HTTP client
+# Banco de Dados PostgreSQL
+asyncpg==0.29.0
+sqlalchemy[asyncio]==2.0.23
+alembic==1.12.1
+
+# Cliente HTTP Assíncrono
+aiohttp==3.9.1
 httpx==0.25.2
 
-# Telegram Bot
+# Processamento e Análise de Dados
+pandas==2.1.4
+numpy==1.25.2
+scipy==1.11.4
+
+# Utilitários
+python-dotenv==1.0.0
+pydantic==2.5.1
+pydantic-settings==2.1.0
+
+# Agendamento de Tarefas
+apscheduler==3.10.4
+
+# Data e Hora
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Logs Estruturados
+structlog==23.2.0
+
+# Validação e Serialização
+marshmallow==3.20.1
+
+# Telegram Bot (Opcional)
 python-telegram-bot==20.7
 
-# Utilities
-python-dotenv==1.0.0
-python-dateutil==2.8.2
-schedule==1.2.0
+# Utilitários de Sistema
+psutil==5.9.6
 
-# Data processing
-pandas==2.0.3
-numpy==1.24.4
-click==8.1.7
-rich==13.7.0
-
-# Production dependencies
-gunicorn==21.2.0
-sentry-sdk[fastapi]==1.38.0
-
-# Security
+# Segurança
 cryptography>=41.0.7
 
-# Validation
+# Validação
 email-validator==2.1.0
 validators==0.22.0
 
-# Data processing
-pandas==2.0.3
-numpy==1.24.4
+# Produção (Opcional)
+gunicorn==21.2.0
+sentry-sdk[fastapi]==1.38.0
+
+# Interface de Linha de Comando
+click==8.1.7
+rich==13.7.0

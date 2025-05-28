@@ -1,113 +1,183 @@
 # 🔧 Guia de Uso
 
-Guia completo para usar o BGP Monitor v1.0 no dia a dia.
+Guia completo para usar o BGP Monitor v2.0 com PostgreSQL no dia a dia.
 
 ## 🚀 Iniciando o Sistema
 
-### Inicialização Básica
+### Via Systemd (Recomendado)
 
 ```bash
-# Método 1: Script de execução
-./run.sh
+# Iniciar o serviço
+sudo systemctl start bgp-monitor
 
-# Método 2: Diretamente via Python
-python3 -m app.main
+# Verificar status
+sudo systemctl status bgp-monitor
 
-# Método 3: Via script de gerenciamento
-./bgp-monitor.sh start
+# Habilitar inicialização automática
+sudo systemctl enable bgp-monitor
+
+# Verificar logs
+sudo journalctl -u bgp-monitor -f
+```
+
+### Execução Manual (Desenvolvimento)
+
+```bash
+# Ativar ambiente virtual
+cd /opt/bgp-monitor
+source venv/bin/activate
+
+# Executar aplicação
+python main.py
+
+# Ou executar em background
+nohup python main.py > logs/app.log 2>&1 &
 ```
 
 ### Verificação de Status
 
 ```bash
-# Status completo do sistema
-./bgp-monitor.sh status
-
 # Status da API
-curl http://localhost:8000/
+curl -s http://localhost:8000/health | jq
 
-# Saúde do sistema
-curl http://localhost:8000/health
+# Dashboard geral
+curl -s http://localhost:8000/dashboard | jq
+
+# Status do scheduler
+curl -s http://localhost:8000/scheduler/status | jq
 ```
 
-## 📊 Gerenciamento de Prefixos
+## 🌐 Gerenciamento de ASNs
 
-### Adicionar Prefixos
+### Adicionar ASNs
 
 ```bash
-# Via script (recomendado)
-./bgp-monitor.sh add-prefix "203.0.113.0/24" "Rede principal"
-./bgp-monitor.sh add-prefix "198.51.100.0/24" "Rede DMZ"
-
-# Via API REST
-curl -X POST http://localhost:8000/prefixes \
+# ASN individual
+curl -X POST "http://localhost:8000/asns" \
   -H "Content-Type: application/json" \
   -d '{
-    "prefix": "203.0.113.0/24",
     "asn": 64512,
-    "description": "Rede principal"
+    "name": "Minha Empresa",
+    "description": "ASN principal da rede",
+    "enabled": true
+  }'
+
+# Múltiplos ASNs em batch
+curl -X POST "http://localhost:8000/asns/batch" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asns": [
+      {"asn": 64512, "name": "Empresa A", "enabled": true},
+      {"asn": 64513, "name": "Empresa B", "enabled": true},
+      {"asn": 13335, "name": "Cloudflare", "enabled": false}
+    ]
   }'
 ```
 
-### Listar Prefixos
+### Listar e Gerenciar ASNs
 
 ```bash
-# Via script
-./bgp-monitor.sh list-prefixes
+# Listar todos os ASNs
+curl -s "http://localhost:8000/asns" | jq
 
-# Via API
-curl http://localhost:8000/prefixes
+# Listar apenas ASNs ativos
+curl -s "http://localhost:8000/asns?enabled=true" | jq
+
+# Obter ASN específico
+curl -s "http://localhost:8000/asns/64512" | jq
+
+# Atualizar ASN
+curl -X PUT "http://localhost:8000/asns/64512" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Novo Nome",
+    "description": "Nova descrição",
+    "enabled": false
+  }'
+
+# Deletar ASN
+curl -X DELETE "http://localhost:8000/asns/64512"
 ```
 
-### Remover Prefixos
+### Importar/Exportar Configurações
 
 ```bash
-# Via script
-./bgp-monitor.sh remove-prefix "203.0.113.0/24"
+# Exportar configuração atual
+curl -s "http://localhost:8000/asns/export" > asns_backup.json
 
-# Via API (usando ID do prefixo)
-curl -X DELETE http://localhost:8000/prefixes/1
+# Importar configuração
+curl -X POST "http://localhost:8000/asns/import" \
+  -H "Content-Type: application/json" \
+  -d @asns_backup.json
 ```
 
-## 🔍 Monitoramento e Verificações
+## 📊 Coleta de Dados e Histórico
 
-### Executar Verificações Manuais
+### Coleta Manual Forçada
 
 ```bash
-# Todas as verificações
-./bgp-monitor.sh check
+# Forçar coleta de todos os ASNs ativos
+curl -X POST "http://localhost:8000/collect/force"
 
-# Verificação específica de prefixos
-curl -X POST http://localhost:8000/monitoring/run-checks
+# Forçar coleta de ASN específico
+curl -X POST "http://localhost:8000/collect/force" \
+  -H "Content-Type: application/json" \
+  -d '{"asn": 64512}'
 
-# Verificação de peers
-curl -X POST http://localhost:8000/monitoring/check-peers
-
-# Validação IRR
-curl -X POST http://localhost:8000/monitoring/check-irr
+# Verificar status da última coleta
+curl -s "http://localhost:8000/dashboard" | jq '.last_collection'
 ```
 
-### Visualizar Métricas
+### Visualizar Dados Históricos
 
 ```bash
-# Métricas completas
-curl http://localhost:8000/metrics | python3 -m json.tool
+# Histórico de ASN específico (últimos 7 dias)
+curl -s "http://localhost:8000/historical/64512?days=7" | jq
 
-# Via script (formatado)
-./bgp-monitor.sh metrics
+# Histórico com filtro de período
+curl -s "http://localhost:8000/historical/64512?start_date=2025-01-01&end_date=2025-01-31" | jq
+
+# Estatísticas resumidas
+curl -s "http://localhost:8000/historical/64512/stats" | jq
 ```
 
-### Histórico de Alertas
+### Dados de Prefixos
 
 ```bash
-# Listar alertas recentes
-curl http://localhost:8000/alerts
+# Prefixos atuais do ASN
+curl -s "http://localhost:8000/historical/64512/prefixes" | jq
 
-# Alertas por tipo
-curl "http://localhost:8000/alerts?type=prefix_missing"
+# Histórico de mudanças de prefixos
+curl -s "http://localhost:8000/historical/64512/prefix-changes?days=30" | jq
+```
 
-# Alertas por severidade
-curl "http://localhost:8000/alerts?severity=critical"
+## 🚨 Detecção de Anomalias
+
+### Verificar Anomalias
+
+```bash
+# Anomalias recentes de todos os ASNs
+curl -s "http://localhost:8000/anomalies" | jq
+
+# Anomalias de ASN específico
+curl -s "http://localhost:8000/anomalies/64512" | jq
+
+# Anomalias por tipo
+curl -s "http://localhost:8000/anomalies?type=sudden_increase" | jq
+
+# Anomalias críticas apenas
+curl -s "http://localhost:8000/anomalies?severity=critical" | jq
+```
+
+### Configurar Sensibilidade
+
+```bash
+# Verificar configuração atual
+curl -s "http://localhost:8000/metrics" | jq '.anomaly_detection'
+
+# Ajustar sensibilidade via .env
+ANOMALY_SENSITIVITY=1.5  # Mais sensível
+ANOMALY_SENSITIVITY=2.5  # Menos sensível
 ```
 
 ## 📱 Notificações Telegram
@@ -115,90 +185,131 @@ curl "http://localhost:8000/alerts?severity=critical"
 ### Testar Telegram
 
 ```bash
-# Teste básico de conectividade
-./bgp-monitor.sh test-telegram
-
-# Teste via API
-curl -X POST http://localhost:8000/test/telegram \
+# Teste básico
+curl -X POST "http://localhost:8000/test/telegram" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Teste do BGP Monitor"}'
-```
+  -d '{"message": "Teste BGP Monitor v2.0 🚀"}'
 
-### Configurar Alertas
-
-```bash
-# Envio manual de alerta de teste
-curl -X POST http://localhost:8000/test/alert \
+# Teste com formatação HTML
+curl -X POST "http://localhost:8000/test/telegram" \
   -H "Content-Type: application/json" \
   -d '{
-    "type": "test",
-    "severity": "info",
-    "message": "Teste de alerta do BGP Monitor",
-    "details": {"timestamp": "2025-05-27T10:00:00Z"}
+    "message": "<b>BGP Monitor v2.0</b>\n<i>Sistema funcionando perfeitamente!</i>\n\n✅ PostgreSQL: Conectado\n🔄 Scheduler: Ativo\n📊 ASNs: 52 monitorados"
   }'
 ```
 
-## 📈 Monitoramento Contínuo
-
-### Verificação Automática
-
-O sistema executa automaticamente:
-
-- **Prefixos BGP**: A cada 5 minutos (300s)
-- **Peers BGP**: A cada 10 minutos (600s)
-- **Validação IRR**: A cada 15 minutos (900s)
-- **Health Check**: A cada 1 minuto (60s)
-- **Relatório Diário**: Às 09:00 UTC
-
-### Logs em Tempo Real
+### Simulador de Alertas
 
 ```bash
-# Seguir logs do sistema
-tail -f /var/log/bgp-monitor.log
+# Alerta de prefixos ausentes
+curl -X POST "http://localhost:8000/test/alert" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "missing_prefixes",
+    "asn": 64512,
+    "severity": "critical",
+    "prefixes": ["203.0.113.0/24", "198.51.100.0/24"]
+  }'
 
-# Logs estruturados (JSON)
-tail -f /var/log/bgp-monitor.log | jq .
-
-# Filtrar por nível
-tail -f /var/log/bgp-monitor.log | grep "ERROR\|WARNING"
+# Alerta de anomalia
+curl -X POST "http://localhost:8000/test/alert" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "sudden_increase", 
+    "asn": 64512,
+    "severity": "warning",
+    "change_percentage": 25.5,
+    "baseline": 120,
+    "current": 151
+  }'
 ```
 
-## 🛠️ Operações de Manutenção
+## 📈 Monitoramento e Métricas
 
-### Parar o Sistema
+### Dashboard Principal
 
 ```bash
-# Parada graceful
-./bgp-monitor.sh stop
+# Visão geral do sistema
+curl -s "http://localhost:8000/dashboard" | jq
 
-# Parada forçada (se necessário)
-./bgp-monitor.sh kill
+# Métricas de performance
+curl -s "http://localhost:8000/metrics" | jq
 
-# Verificar se parou
-./bgp-monitor.sh status
+# Status detalhado
+curl -s "http://localhost:8000/health" | jq
 ```
 
-### Reiniciar o Sistema
+### Estatísticas por ASN
 
 ```bash
-# Reinicialização completa
-./bgp-monitor.sh restart
+# Top ASNs por número de prefixos
+curl -s "http://localhost:8000/dashboard" | jq '.asn_stats | sort_by(.prefix_count) | reverse'
 
-# Recarregar configuração (se disponível)
-./bgp-monitor.sh reload
+# ASNs com mais anomalias
+curl -s "http://localhost:8000/dashboard" | jq '.asn_stats | sort_by(.anomaly_count) | reverse'
+```
+
+### Alertas e Histórico
+
+```bash
+# Alertas das últimas 24h
+curl -s "http://localhost:8000/alerts?hours=24" | jq
+
+# Histórico de alertas por tipo
+curl -s "http://localhost:8000/alerts/stats" | jq
+
+# Alertas não resolvidos
+curl -s "http://localhost:8000/alerts?status=active" | jq
+```
+
+## 🔧 Manutenção e Operações
+
+### Controle do Serviço
+
+```bash
+# Parar o sistema
+sudo systemctl stop bgp-monitor
+
+# Iniciar o sistema
+sudo systemctl start bgp-monitor
+
+# Reiniciar o sistema
+sudo systemctl restart bgp-monitor
+
+# Verificar status
+sudo systemctl status bgp-monitor
+
+# Verificar logs
+sudo journalctl -u bgp-monitor -f
 ```
 
 ### Backup e Restore
 
 ```bash
+# Backup do banco PostgreSQL
+pg_dump -h localhost -U bgp_monitor bgp_monitor > backup_$(date +%Y%m%d_%H%M%S).sql
+
 # Backup da configuração
-./bgp-monitor.sh backup
+cp .env .env.backup.$(date +%Y%m%d)
+cp -r logs logs.backup.$(date +%Y%m%d)
 
-# Backup completo (inclui dados em memória)
-./bgp-monitor.sh backup --full
+# Restore do banco
+psql -h localhost -U bgp_monitor bgp_monitor < backup_20250527_120000.sql
+```
 
-# Restaurar configuração
-./bgp-monitor.sh restore backup-2025-05-27.tar.gz
+### Limpeza Manual
+
+```bash
+# Limpeza de dados antigos via API
+curl -X POST "http://localhost:8000/admin/cleanup" \
+  -H "Content-Type: application/json" \
+  -d '{"days": 365}'
+
+# Verificar espaço usado
+curl -s "http://localhost:8000/metrics" | jq '.database_size'
+
+# Limpeza de logs
+find logs/ -name "*.log" -mtime +30 -delete
 ```
 
 ## 🔍 Diagnóstico e Troubleshooting
@@ -206,135 +317,193 @@ tail -f /var/log/bgp-monitor.log | grep "ERROR\|WARNING"
 ### Verificar Conectividade
 
 ```bash
-# Teste de conectividade com RIPE
-./bgp-monitor.sh test-connectivity
+# Teste de conectividade PostgreSQL
+psql -h localhost -U bgp_monitor -d bgp_monitor -c "SELECT version();"
 
-# Teste manual da RIPE API
-curl -s "https://stat.ripe.net/data/announced-prefixes/data.json?resource=AS64512"
+# Teste RIPE API
+curl -s "https://stat.ripe.net/data/announced-prefixes/data.json?resource=AS64512" | jq '.data.prefixes | length'
 
-# Teste de resolução DNS
-nslookup stat.ripe.net
+# Teste Telegram
+curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getMe" | jq
 ```
 
 ### Debug do Sistema
 
 ```bash
 # Executar em modo debug
-DEBUG=true ./run.sh
+DEBUG=true python main.py
 
 # Verificar configuração carregada
-./bgp-monitor.sh config
+curl -s "http://localhost:8000/health" | jq '.configuration'
 
-# Validar arquivo .env
-./bgp-monitor.sh validate-config
+# Logs em tempo real
+tail -f logs/bgp-monitor.log | jq -r '.timestamp + " " + .level + " " + .message'
 ```
 
-### Verificar Saúde dos Componentes
+### Verificar Performance
 
 ```bash
-# Saúde detalhada
-curl http://localhost:8000/health?detailed=true
+# Métricas de coleta
+curl -s "http://localhost:8000/metrics" | jq '.collection_performance'
 
-# Status individual dos monitores
-curl http://localhost:8000/monitoring/status
+# Status do rate limiting
+curl -s "http://localhost:8000/metrics" | jq '.rate_limiting'
+
+# Uso de recursos
+curl -s "http://localhost:8000/metrics" | jq '.system_metrics'
 ```
 
 ## 📊 Relatórios e Análises
 
-### Relatório Diário
+### Relatórios Automatizados
+
+O sistema envia automaticamente:
+- **Relatório Diário**: Resumo das últimas 24h às 09:00 UTC
+- **Relatório Semanal**: Resumo semanal aos domingos às 09:00 UTC
+- **Alertas em Tempo Real**: Conforme anomalias são detectadas
+
+### Relatórios Manuais
 
 ```bash
-# Gerar relatório manual
-./bgp-monitor.sh report
+# Relatório de ASN específico
+curl -s "http://localhost:8000/reports/asn/64512" | jq
 
-# Relatório via API
-curl http://localhost:8000/reports/daily
+# Relatório de período customizado
+curl -s "http://localhost:8000/reports/custom?start_date=2025-01-01&end_date=2025-01-31" | jq
 
-# Relatório personalizado
-curl "http://localhost:8000/reports/custom?from=2025-05-26&to=2025-05-27"
+# Estatísticas de anomalias
+curl -s "http://localhost:8000/reports/anomalies" | jq
 ```
 
-### Estatísticas de Performance
+## 🎯 Casos de Uso Avançados
+
+### 1. Monitoramento de Migração BGP
 
 ```bash
-# Métricas de performance
-curl http://localhost:8000/metrics/performance
-
-# Tempo de resposta das verificações
-curl http://localhost:8000/metrics/timing
-
-# Estatísticas de alertas
-curl http://localhost:8000/metrics/alerts
-```
-
-## 🎯 Casos de Uso Comuns
-
-### 1. Monitoramento de Mudança de Provider
-
-```bash
-# Adicionar novos prefixos antes da migração
-./bgp-monitor.sh add-prefix "203.0.113.0/24" "Rede principal - Provider A"
-
-# Monitorar durante a migração
-./bgp-monitor.sh check --continuous
-
-# Verificar se anúncio está ativo
-curl "http://localhost:8000/prefixes/203.0.113.0%2F24/status"
-```
-
-### 2. Auditoria de Segurança BGP
-
-```bash
-# Verificar todos os prefixos anunciados
-curl "http://localhost:8000/monitoring/audit/prefixes"
-
-# Validar conformidade IRR
-curl "http://localhost:8000/monitoring/audit/irr"
-
-# Gerar relatório de conformidade
-curl "http://localhost:8000/reports/compliance"
-```
-
-### 3. Resposta a Incidentes
-
-```bash
-# Verificação imediata de todos os prefixos
-./bgp-monitor.sh emergency-check
-
-# Forçar envio de relatório de status
-./bgp-monitor.sh force-report
-
-# Alterar nível de alertas temporariamente
-./bgp-monitor.sh set-alert-level critical
-```
-
-## 🔧 Personalização
-
-### Alterar Intervalos Temporariamente
-
-```bash
-# Via variáveis de ambiente
-PREFIX_CHECK_INTERVAL=60 ./run.sh
-
-# Via API (se implementado)
-curl -X PUT http://localhost:8000/config/intervals \
+# Antes da migração - adicionar ASNs envolvidos
+curl -X POST "http://localhost:8000/asns/batch" \
   -H "Content-Type: application/json" \
-  -d '{"prefix_check": 60, "peer_check": 120}'
+  -d '{
+    "asns": [
+      {"asn": 64512, "name": "ASN Origem", "enabled": true},
+      {"asn": 64513, "name": "ASN Destino", "enabled": true}
+    ]
+  }'
+
+# Durante a migração - monitoramento intensivo
+COLLECTION_INTERVAL=300 # Reduzir para 5 minutos
+
+# Verificar transferência de prefixos
+curl -s "http://localhost:8000/historical/64512/prefixes" | jq
+curl -s "http://localhost:8000/historical/64513/prefixes" | jq
 ```
 
-### Filtros de Alertas
+### 2. Detecção de BGP Hijacking
 
 ```bash
-# Silenciar alertas específicos
-curl -X POST http://localhost:8000/alerts/silence \
-  -H "Content-Type: application/json" \
-  -d '{"type": "peer_loss", "duration": 3600}'
+# Monitorar prefixos específicos suspeitos
+curl -s "http://localhost:8000/anomalies?type=bgp_leak" | jq
 
-# Alterar severidade de alertas
-curl -X PUT http://localhost:8000/alerts/severity \
-  -H "Content-Type: application/json" \
-  -d '{"type": "prefix_missing", "severity": "warning"}'
+# Verificar origem dos anúncios
+curl -s "http://localhost:8000/historical/search/prefix/203.0.113.0%2F24" | jq
 ```
+
+### 3. Análise de Estabilidade
+
+```bash
+# Verificar instabilidade histórica
+curl -s "http://localhost:8000/anomalies?type=routing_instability&days=30" | jq
+
+# Análise de tendências
+curl -s "http://localhost:8000/historical/64512/trends" | jq
+```
+
+## 📈 Otimização e Tuning
+
+### Para Ambientes de Alto Volume
+
+```bash
+# Aumentar pool de conexões PostgreSQL
+# Em postgresql.conf:
+max_connections = 200
+shared_buffers = 512MB
+
+# Ajustar configurações do sistema
+COLLECTION_INTERVAL=1800
+API_RATE_LIMIT_PER_ASN=60
+API_BATCH_SIZE=2
+```
+
+### Para Monitoramento Crítico
+
+```bash
+# Configurações de alta responsividade
+COLLECTION_INTERVAL=300
+ANOMALY_SENSITIVITY=1.5
+API_RATE_LIMIT_PER_ASN=30
+```
+
+## 🔐 Segurança e Compliance
+
+### Auditoria de Acesso
+
+```bash
+# Verificar logs de acesso à API
+grep "GET\|POST\|PUT\|DELETE" logs/bgp-monitor.log | jq
+
+# Estatísticas de uso
+curl -s "http://localhost:8000/metrics" | jq '.api_usage'
+```
+
+### Validação de Configuração
+
+```bash
+# Verificar configuração de segurança
+curl -s "http://localhost:8000/health" | jq '.security_check'
+
+# Testar configurações
+curl -X POST "http://localhost:8000/admin/validate-config"
+```
+
+## 📚 Próximos Passos
+
+Após dominar o uso básico:
+
+1. [🌐 Explore toda a API REST](API.md)
+2. [🏗️ Entenda a arquitetura do sistema](ARCHITECTURE.md)
+3. [⚙️ Configure alertas avançados](CONFIGURATION.md)
+4. [🔍 Troubleshooting avançado](TROUBLESHOOTING.md)
+
+## 💡 Dicas e Truques
+
+### Comandos Úteis do Dia a Dia
+
+```bash
+# Verificação rápida de saúde
+alias bgp-health='curl -s http://localhost:8000/health | jq .status'
+
+# Dashboard resumido
+alias bgp-dash='curl -s http://localhost:8000/dashboard | jq "{asns: .total_asns, last_collection: .last_collection, anomalies: .recent_anomalies}"'
+
+# Status do scheduler
+alias bgp-scheduler='curl -s http://localhost:8000/scheduler/status | jq'
+
+# Logs em tempo real formatados
+alias bgp-logs='tail -f logs/bgp-monitor.log | jq -r ".timestamp + \" \" + .level + \" \" + .message"'
+```
+
+### Automatização com Scripts
+
+```bash
+#!/bin/bash
+# check-bgp-status.sh
+curl -s http://localhost:8000/health | jq .status | grep -q "healthy" || {
+    echo "BGP Monitor não está saudável!"
+    sudo systemctl restart bgp-monitor
+}
+```
+
+Esta documentação cobre todos os aspectos práticos do uso do BGP Monitor v2.0. Para informações mais técnicas, consulte os outros documentos na pasta `docs/`.
 
 ## 📱 Interface Web (Futuro)
 

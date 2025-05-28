@@ -1,5 +1,9 @@
 import os
 from typing import Optional
+from dotenv import load_dotenv
+
+# Carrega variáveis do arquivo .env
+load_dotenv()
 
 
 class Settings:
@@ -34,6 +38,21 @@ class Settings:
         
         # Alerting
         self.alert_cooldown = int(os.getenv("ALERT_COOLDOWN", "1800"))
+        
+        # Database settings
+        self.db_host = os.getenv("DB_HOST", "localhost")
+        self.db_port = int(os.getenv("DB_PORT", "5432"))
+        self.db_name = os.getenv("DB_NAME", "bgp_monitor")
+        self.db_user = os.getenv("DB_USER", "bgp_monitor")
+        self.db_password = os.getenv("DB_PASSWORD", "bgp_monitor_password")
+        
+        # Data retention settings
+        self.data_retention_days = int(os.getenv("DATA_RETENTION_DAYS", "365"))
+        self.cleanup_interval_hours = int(os.getenv("CLEANUP_INTERVAL_HOURS", "24"))
+        
+        # Rate limiting for API calls
+        self.api_rate_limit_per_asn = int(os.getenv("API_RATE_LIMIT_PER_ASN", "30"))  # seconds
+        self.api_batch_size = int(os.getenv("API_BATCH_SIZE", "5"))  # ASNs per batch
 
 
 # Instância global das configurações

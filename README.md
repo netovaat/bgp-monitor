@@ -1,161 +1,399 @@
-# BGP Monitor v1.0.1
+# BGP Monitor v2.0
 
-Sistema simplificado de monitoramento BGP com notificações via Telegram.
+🚀 **Sistema avançado de monitoramento BGP com PostgreSQL e detecção de anomalias estatísticas**
 
-## 🎯 Visão Geral
+Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos dados BGP, armazene histórico por 1 ano e receba alertas inteligentes. Sistema completo com rate limiting otimizado para não ser bloqueado pela API RIPE.
 
-O BGP Monitor é uma ferramenta leve e autônoma para monitoramento de infraestrutura BGP, oferecendo:
+## ✨ Principais Funcionalidades
 
-- **Monitoramento de Prefixos BGP** - Verifica se seus prefixos estão sendo anunciados globalmente
-- **Monitoramento de Peers** - Detecta perda de relacionamentos BGP e upstreams
-- **Validação IRR** - Verifica consistência com bancos de dados IRR
-- **Notificações Telegram** - Alertas em tempo real via bot do Telegram
-- **API REST** - Interface completa para gerenciamento e consultas
-- **Sistema de Métricas** - Monitoramento de saúde e estatísticas
+### 🎯 **Monitoramento Avançado**
+- **Multi-ASN**: Monitore até 50+ ASNs simultaneamente
+- **Histórico Completo**: 1 ano de dados históricos no PostgreSQL
+- **Rate Limiting Inteligente**: 45s entre coletas + batches de 3-5 ASNs
+- **Coleta Automática**: A cada 15 minutos com scheduler integrado
 
-## ⚡ Características
+### 📊 **Detecção de Anomalias Estatísticas**
+- **Análise Z-score**: Detecção baseada em desvio padrão
+- **Baseline Dinâmico**: Cálculo automático de linha de base
+- **Tipos de Anomalias**: Aumentos/diminuições súbitas, instabilidade
+- **Sensibilidade Configurável**: Thresholds ajustáveis por necessidade
 
-- ✅ **Zero dependências externas** - Sem Docker, bancos de dados ou Redis
-- ✅ **Leve e rápido** - Armazenamento em memória
-- ✅ **Fácil instalação** - Apenas Python 3.10+ e dependências Python
-- ✅ **Configuração simples** - Arquivo .env único
-- ✅ **Altamente confiável** - Menos componentes = menos falhas
-- ✅ **Scheduler automático** - Verificações periódicas automáticas
+### 🔔 **Sistema de Alertas**
+- **Telegram Integrado**: Alertas em tempo real em português
+- **Severidades**: Crítico 🚨, Aviso ⚠️, Info ℹ️
+- **Contexto Detalhado**: Causas possíveis e recomendações
+- **Relatórios Diários**: Resumo automático de atividades
 
-## 📋 Requisitos
+### 🚀 **API REST Completa**
+- **Gestão de ASNs**: CRUD completo para configuração
+- **Dados Históricos**: Acesso a snapshots e estatísticas
+- **Dashboard**: Visão geral de todos os ASNs monitorados
+- **Import/Export**: Backup e restauração de configurações
 
-### Sistema Operacional
-- Linux (Ubuntu 20.04+ recomendado)
-- Python 3.10 ou superior
-- Git para instalação
-- Acesso à internet para consultas RIPE API
+## 🏗️ **Arquitetura do Sistema**
 
-### Dependências Opcionais
-- Bot do Telegram (recomendado para alertas)
-- Curl (para testes da API)
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    BGP Monitor v2.0                        │
+├─────────────────────────────────────────────────────────────┤
+│  🌐 API REST (FastAPI)     │  📊 Dashboard & Endpoints      │
+│  ⏰ Scheduler              │  🔄 Coletas Automáticas        │
+│  🎯 ASN Manager            │  ⚙️ Configuração Multi-ASN     │
+│  📈 Anomaly Detector       │  🧮 Análise Estatística        │
+│  💾 Database Layer         │  🐘 PostgreSQL + Alembic       │
+│  🔌 RIPE API Client        │  🌍 Rate Limiting Inteligente  │
+│  📱 Telegram Alerts        │  🇧🇷 Mensagens em Português    │
+└─────────────────────────────────────────────────────────────┘
+```
 
-## 🚀 Instalação Completa
+## 🚀 **Instalação Rápida (Ubuntu/Debian)**
 
-### 1. Preparação do Sistema
+### **Opção 1: Instalação Automatizada (Recomendada)**
+
 ```bash
-# Atualizar sistema (Ubuntu/Debian)
+# 1. Baixar e executar o script de instalação
+wget -O install.sh https://raw.githubusercontent.com/seu-usuario/bgp-monitor/main/install.sh
+chmod +x install.sh
+sudo ./install.sh
+
+# 2. Configurar suas variáveis
+sudo nano /opt/bgp-monitor/.env
+
+# 3. Iniciar o serviço
+sudo systemctl start bgp-monitor
+```
+
+### **Opção 2: Instalação Manual**
+
+#### **1. Dependências do Sistema**
+```bash
+# Atualizar sistema
 sudo apt update && sudo apt upgrade -y
 
-# Instalar dependências do sistema
-sudo apt install -y python3 python3-pip python3-venv git build-essential curl
+# Instalar dependências básicas
+sudo apt install -y \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    postgresql-15 \
+    postgresql-client-15 \
+    postgresql-contrib-15 \
+    git \
+    curl \
+    build-essential
 
-# Verificar versão do Python (deve ser 3.10+)
-python3 --version
+# Iniciar PostgreSQL
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
 ```
 
-### 2. Instalação do BGP Monitor
+#### **2. Configurar Banco de Dados**
 ```bash
+# Criar usuário e banco
+sudo -u postgres psql -c "CREATE USER bgp_monitor WITH PASSWORD 'bgp_monitor_password';"
+sudo -u postgres psql -c "CREATE DATABASE bgp_monitor OWNER bgp_monitor;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE bgp_monitor TO bgp_monitor;"
+```
+
+#### **3. Instalar Aplicação**
+```bash
+# Criar usuário do sistema
+sudo useradd -r -s /bin/bash -d /opt/bgp-monitor -m bgpmonitor
+
 # Clonar repositório
-git clone https://github.com/seu-usuario/bgp-monitor.git
-cd bgp-monitor
+git clone https://github.com/seu-usuario/bgp-monitor.git /opt/bgp-monitor
+sudo chown -R bgpmonitor:bgpmonitor /opt/bgp-monitor
+
+# Criar ambiente virtual
+cd /opt/bgp-monitor
+sudo -u bgpmonitor python3.11 -m venv venv
 
 # Instalar dependências Python
-pip3 install -r requirements.txt
+sudo -u bgpmonitor bash -c "
+    source venv/bin/activate
+    pip install --upgrade pip
+    pip install -r requirements.txt
+"
 
 # Configurar ambiente
-cp .env.example .env
-nano .env  # Editar configurações
+sudo -u bgpmonitor cp .env.example .env
+sudo -u bgpmonitor nano .env
 
-# Tornar scripts executáveis
-chmod +x run.sh bgp-monitor.sh
+# Executar migrações
+sudo -u bgpmonitor bash -c "
+    source venv/bin/activate
+    alembic upgrade head
+"
 ```
 
-### 3. Configuração Básica
+## ⚙️ **Configuração**
+
+### **Arquivo .env Principal**
 ```bash
-# Editar arquivo .env com suas configurações:
-# TARGET_ASN=65001          # Seu ASN
-# HOST=0.0.0.0             # IP da API
-# PORT=8000                # Porta da API
-# TELEGRAM_BOT_TOKEN=...   # Token do bot (opcional)
-# TELEGRAM_CHAT_ID=...     # ID do chat (opcional)
+# === BANCO DE DADOS ===
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=bgp_monitor
+DB_USER=bgp_monitor
+DB_PASSWORD=your_secure_password_here
+
+# === TELEGRAM BOT ===
+TELEGRAM_BOT_TOKEN=123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ_example_token
+TELEGRAM_CHAT_ID=-1001234567890
+
+# === APLICAÇÃO ===
+HOST=0.0.0.0
+PORT=8000
+DEBUG=false
+
+# === BGP MONITORAMENTO ===
+COLLECTION_INTERVAL=900          # 15 minutos
+API_RATE_LIMIT_PER_ASN=45       # 45 segundos entre requests
+API_BATCH_SIZE=3                 # 3 ASNs por batch
+API_TIMEOUT=30
+
+# === DETECÇÃO DE ANOMALIAS ===
+ANOMALY_SENSITIVITY=2.0          # Z-score threshold
+MIN_HISTORICAL_DAYS=7            # Mínimo de dados históricos
+BASELINE_CALCULATION_DAYS=30     # Dias para baseline
+
+# === RETENÇÃO DE DADOS ===
+DATA_RETENTION_DAYS=365          # 1 ano de retenção
+CLEANUP_INTERVAL_HOURS=24        # Limpeza diária
+
+# === LOGS ===
+LOG_LEVEL=INFO
 ```
 
-### 4. Execução
+### **Configurar ASNs para Monitoramento**
+
+Via API REST:
 ```bash
-# Executar em foreground (desenvolvimento)
-./run.sh
+# Adicionar ASN individual
+curl -X POST "http://localhost:8000/asns" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asn": 64512,
+    "name": "Minha Empresa",
+    "description": "ASN principal",
+    "enabled": true
+  }'
 
-# Ou executar em background (produção)
-./bgp-monitor.sh start
+# Adicionar múltiplos ASNs
+curl -X POST "http://localhost:8000/asns/batch" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asns": [
+      {"asn": 15169, "name": "Google", "enabled": true},
+      {"asn": 32934, "name": "Facebook", "enabled": true},
+      {"asn": 13335, "name": "Cloudflare", "enabled": false}
+    ]
+  }'
 ```
 
-## 📖 Documentação Completa
+## 🏃 **Execução em Background**
 
-- [📦 Guia de Instalação](docs/INSTALLATION.md)
-- [⚙️ Configuração](docs/CONFIGURATION.md)
+### **Como Serviço Systemd (Produção)**
+```bash
+# O script install.sh já cria o serviço automaticamente
+# Comandos de gerenciamento:
+
+# Iniciar serviço
+sudo systemctl start bgp-monitor
+
+# Parar serviço
+sudo systemctl stop bgp-monitor
+
+# Reiniciar serviço
+sudo systemctl restart bgp-monitor
+
+# Status do serviço
+sudo systemctl status bgp-monitor
+
+# Habilitar inicialização automática
+sudo systemctl enable bgp-monitor
+
+# Ver logs em tempo real
+sudo journalctl -u bgp-monitor -f
+```
+
+### **Execução Manual em Background**
+```bash
+# Ativar ambiente virtual
+cd /opt/bgp-monitor
+source venv/bin/activate
+
+# Executar em background
+nohup python main.py > logs/bgp-monitor.log 2>&1 &
+
+# Verificar processo
+ps aux | grep main.py
+```
+
+## 📋 **Comandos Úteis**
+
+### **Verificação de Status**
+```bash
+# Status da API
+curl -s http://localhost:8000/health | jq
+
+# Dashboard geral
+curl -s http://localhost:8000/dashboard | jq
+
+# Status do scheduler
+curl -s http://localhost:8000/scheduler/status | jq
+
+# Listar ASNs configurados
+curl -s http://localhost:8000/asns | jq
+```
+
+### **Coleta de Dados**
+```bash
+# Forçar coleta de todos os ASNs
+curl -X POST "http://localhost:8000/collect/force"
+
+# Coleta de ASN específico
+curl -X POST "http://localhost:8000/collect/force" \
+  -H "Content-Type: application/json" \
+  -d '{"asn": 64512}'
+
+# Verificar última coleta
+curl -s "http://localhost:8000/dashboard" | jq '.last_collection'
+```
+
+### **Gestão do Banco de Dados**
+```bash
+# Conectar ao banco
+psql -h localhost -U bgp_monitor -d bgp_monitor
+
+# Backup do banco
+pg_dump -h localhost -U bgp_monitor bgp_monitor > backup_$(date +%Y%m%d).sql
+
+# Verificar estatísticas
+curl -s "http://localhost:8000/metrics" | jq '.database_stats'
+```
+
+## 📊 **API e Dashboard**
+
+### **Endpoints Principais**
+```bash
+# Dashboard geral
+curl http://localhost:8000/dashboard
+
+# Dados históricos de ASN
+curl http://localhost:8000/historical/64512
+
+# Anomalias detectadas
+curl http://localhost:8000/anomalies
+
+# Estatísticas do sistema
+curl http://localhost:8000/metrics
+
+# Gestão de ASNs
+curl http://localhost:8000/asns
+```
+
+### **Documentação Interativa**
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+## 🔧 **Troubleshooting**
+
+### **Problemas Comuns**
+
+#### **Erro de Conexão PostgreSQL**
+```bash
+# Verificar se PostgreSQL está rodando
+sudo systemctl status postgresql
+
+# Testar conexão manual
+psql -h localhost -U bgp_monitor -d bgp_monitor -c "SELECT version();"
+
+# Verificar logs do PostgreSQL
+sudo journalctl -u postgresql -f
+```
+
+#### **Rate Limiting da API RIPE**
+```bash
+# Verificar configurações atuais
+curl -s http://localhost:8000/metrics | jq '.rate_limiting'
+
+# Ajustar se necessário em .env:
+# API_RATE_LIMIT_PER_ASN=60
+# API_BATCH_SIZE=2
+```
+
+#### **Problemas de Permissão**
+```bash
+# Corrigir permissões
+sudo chown -R bgpmonitor:bgpmonitor /opt/bgp-monitor
+sudo chmod +x /opt/bgp-monitor/install.sh
+```
+
+#### **Telegram não funciona**
+```bash
+# Testar bot manualmente
+curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getMe" | jq
+
+# Testar via API
+curl -X POST "http://localhost:8000/test/telegram" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Teste BGP Monitor v2.0"}'
+```
+
+## 📈 **Monitoramento e Métricas**
+
+### **Verificar Performance**
+```bash
+# Métricas de sistema
+curl -s http://localhost:8000/metrics | jq
+
+# Performance da coleta
+curl -s http://localhost:8000/metrics | jq '.collection_performance'
+
+# Estatísticas de anomalias
+curl -s http://localhost:8000/anomalies/stats | jq
+```
+
+### **Logs Estruturados**
+```bash
+# Logs em tempo real
+sudo journalctl -u bgp-monitor -f
+
+# Filtrar por nível de erro
+sudo journalctl -u bgp-monitor | grep ERROR
+
+# Filtrar anomalias
+sudo journalctl -u bgp-monitor | grep ANOMALY
+```
+
+## 📚 **Documentação Completa**
+
+- [📖 Guia de Instalação](docs/INSTALLATION.md)
+- [⚙️ Configuração Detalhada](docs/CONFIGURATION.md)
 - [🔧 Guia de Uso](docs/USAGE.md)
 - [🌐 Referência da API](docs/API.md)
-- [🏗️ Arquitetura](docs/ARCHITECTURE.md)
+- [🏗️ Arquitetura do Sistema](docs/ARCHITECTURE.md)
 - [🔍 Troubleshooting](docs/TROUBLESHOOTING.md)
 
-## 🎯 Uso Básico
-
-```bash
-# Verificar status do sistema
-./bgp-monitor.sh status
-
-# Adicionar prefixo para monitoramento
-./bgp-monitor.sh add-prefix "203.0.113.0/24" "Rede principal"
-
-# Listar prefixos monitorados
-./bgp-monitor.sh list-prefixes
-
-# Executar verificações manuais
-./bgp-monitor.sh check
-
-# Parar o sistema
-./bgp-monitor.sh stop
-```
-
-## 📊 Status da API
-
-Acesse `http://localhost:8000` para:
-- Ver status geral do sistema
-- Gerenciar prefixos monitorados
-- Consultar métricas e alertas
-- Executar verificações manuais
-
-## 📱 Configuração do Telegram
-
-1. Crie um bot no [@BotFather](https://t.me/BotFather)
-2. Obtenha o token do bot
-3. Obtenha seu Chat ID (use [@userinfobot](https://t.me/userinfobot))
-4. Configure no arquivo `.env`
-
-## 📈 Monitoramento
-
-O sistema executa automaticamente:
-- **Verificação de prefixos** - A cada 5 minutos
-- **Verificação de peers** - A cada 10 minutos  
-- **Validação IRR** - A cada 15 minutos
-- **Health checks** - A cada 1 minuto
-- **Relatórios diários** - Às 09:00 UTC
-
-## 🤝 Contribuição
-
-Contribuições são bem-vindas! Veja como:
+## 🤝 **Contribuindo**
 
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+2. Crie sua feature branch (`git checkout -b feature/nova-funcionalidade`)
+3. Commit suas mudanças (`git commit -am 'Adiciona nova funcionalidade'`)
+4. Push para a branch (`git push origin feature/nova-funcionalidade`)
 5. Abra um Pull Request
 
-## 📄 Licença
+## 📄 **Licença**
 
 Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## 📞 Suporte
+## 🆘 **Suporte**
 
-- 📧 **Issues**: [GitHub Issues](https://github.com/seu-usuario/bgp-monitor/issues)
-- 📖 **Documentação**: [docs/](docs/)
-- 💬 **Discussões**: [GitHub Discussions](https://github.com/seu-usuario/bgp-monitor/discussions)
+- **Issues**: [GitHub Issues](https://github.com/seu-usuario/bgp-monitor/issues)
+- **Documentação**: [Wiki do Projeto](https://github.com/seu-usuario/bgp-monitor/wiki)
+- **Discussões**: [GitHub Discussions](https://github.com/seu-usuario/bgp-monitor/discussions)
 
 ---
 
-**BGP Monitor v1.0** - Sistema simplificado de monitoramento BGP
+**BGP Monitor v2.0** - Monitoramento BGP profissional com PostgreSQL 🚀

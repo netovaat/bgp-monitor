@@ -7,15 +7,19 @@ from datetime import datetime
 
 from app.core.config import settings
 from app.services.telegram import telegram_service
+from app.services.prefix_monitor import prefix_monitor
+from app.services.peer_monitor import peer_monitor
+from app.services.irr_validator import irr_validator
 from app.utils.metrics import metrics
+from app.api.bgp_historical import router as bgp_router
 import logging
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="BGP Monitor API",
-    description="API para monitoramento BGP com alertas via Telegram",
-    version="1.0.1"
+    description="API para monitoramento BGP com dados históricos e alertas via Telegram",
+    version="2.0.0"
 )
 
 # CORS
@@ -26,6 +30,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Incluir rotas da API histórica
+app.include_router(bgp_router)
 
 # Lista de prefixos monitorados (armazenada em memória)
 monitored_prefixes = []
@@ -187,6 +194,181 @@ async def run_manual_checks():
         )
 
 
+@app.post("/monitoring/check-prefixes")
+async def run_prefix_check():
+    """Executa verificação manual de prefixos"""
+    try:
+        start_time = time.time()
+        logger.info("Running manual prefix check")
+        
+        # Executar verificação de prefixos
+        alerts = await prefix_monitor.check_prefix_announcements()
+        
+        duration = time.time() - start_time
+        metrics.record_check_duration("prefix_check", duration)
+        
+        return {
+            "status": "completed",
+            "duration": duration,
+            "timestamp": datetime.utcnow().isoformat(),
+            "alerts_generated": len(alerts),
+            "alerts": alerts[:5] if alerts else []  # Limitar a 5 alertas para resposta
+        }
+        
+    except Exception as e:
+        logger.error(f"Prefix check failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro na verificação de prefixos: {str(e)}"
+        )
+
+
+@app.post("/monitoring/check-peers")
+async def run_peer_check():
+    """Executa verificação manual de peers"""
+    try:
+        start_time = time.time()
+        logger.info("Running manual peer check")
+        
+        # Executar verificação de peers
+        alerts = await peer_monitor.check_peer_relationships()
+        
+        duration = time.time() - start_time
+        metrics.record_check_duration("peer_check", duration)
+        
+        return {
+            "status": "completed",
+            "duration": duration,
+            "timestamp": datetime.utcnow().isoformat(),
+            "alerts_generated": len(alerts),
+            "alerts": alerts[:5] if alerts else []
+        }
+        
+    except Exception as e:
+        logger.error(f"Peer check failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro na verificação de peers: {str(e)}"
+        )
+
+
+@app.post("/monitoring/check-latency")
+async def run_latency_check():
+    """Executa verificação manual de latência"""
+    try:
+        start_time = time.time()
+        logger.info("Running manual latency check")
+        
+        # Executar medição de latência
+        alerts = await peer_monitor.measure_latency()
+        
+        duration = time.time() - start_time
+        metrics.record_check_duration("latency_check", duration)
+        
+        return {
+            "status": "completed",
+            "duration": duration,
+            "timestamp": datetime.utcnow().isoformat(),
+            "alerts_generated": len(alerts),
+            "alerts": alerts[:5] if alerts else []
+        }
+        
+    except Exception as e:
+        logger.error(f"Latency check failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro na verificação de latência: {str(e)}"
+        )
+
+
+@app.post("/monitoring/check-irr")
+async def run_irr_check():
+    """Executa verificação manual de IRR"""
+    try:
+        start_time = time.time()
+        logger.info("Running manual IRR check")
+        
+        # Obter prefixos monitorados
+        monitored_prefixes = prefix_monitor.get_monitored_prefixes()
+        
+        # Executar validação IRR
+        alerts = await irr_validator.validate_all_monitored_prefixes(monitored_prefixes)
+        
+        duration = time.time() - start_time
+        metrics.record_check_duration("irr_check", duration)
+        
+        return {
+            "status": "completed",
+            "duration": duration,
+            "timestamp": datetime.utcnow().isoformat(),
+            "prefixes_validated": len(monitored_prefixes),
+            "alerts_generated": len(alerts),
+            "alerts": alerts[:5] if alerts else []
+        }
+        
+    except Exception as e:
+        logger.error(f"IRR check failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro na verificação IRR: {str(e)}"
+        )
+
+
+@app.post("/prefixes/add")
+async def add_prefix():
+    """Adiciona um prefixo para monitoramento"""
+    try:
+        # Por enquanto, vamos usar dados de exemplo
+        # Em uma implementação completa, isso viria do body da requisição
+        example_prefix = "203.0.113.0/24"
+        description = "Prefixo de exemplo"
+        
+        prefix_monitor.add_monitored_prefix(example_prefix, description)
+        
+        logger.info(f"Prefix added via API: {example_prefix}")
+        
+        return {
+            "status": "success",
+            "message": f"Prefixo {example_prefix} adicionado com sucesso",
+            "prefix": example_prefix,
+            "description": description,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to add prefix: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao adicionar prefixo: {str(e)}"
+        )
+
+
+@app.post("/prefixes/remove")
+async def remove_prefix():
+    """Remove um prefixo do monitoramento"""
+    try:
+        # Exemplo de remoção - em implementação real viria do body
+        example_prefix = "203.0.113.0/24"
+        
+        prefix_monitor.remove_monitored_prefix(example_prefix)
+        
+        logger.info(f"Prefix removed via API: {example_prefix}")
+        
+        return {
+            "status": "success",
+            "message": f"Prefixo {example_prefix} removido com sucesso",
+            "prefix": example_prefix,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to remove prefix: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao remover prefixo: {str(e)}"
+        )
+
+
 # Configurações
 @app.get("/config")
 async def get_config():
@@ -201,6 +383,52 @@ async def get_config():
             "latency_check": settings.latency_check_interval
         }
     }
+
+
+# Endpoints de consulta RIPE API
+@app.get("/as/{asn}")
+async def get_as_info(asn: int):
+    """Obtém informações de um ASN via RIPE API"""
+    try:
+        from app.services.ripe_api import ripe_api
+        as_info = await ripe_api.get_as_info(asn)
+        return as_info
+    except Exception as e:
+        logger.error(f"Failed to get AS{asn} info: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao obter informações do AS{asn}: {str(e)}"
+        )
+
+
+@app.get("/prefixes/{asn}")
+async def get_as_prefixes(asn: int):
+    """Obtém prefixos anunciados por um ASN via RIPE API"""
+    try:
+        from app.services.ripe_api import ripe_api
+        prefixes = await ripe_api.get_prefixes(asn)
+        return prefixes
+    except Exception as e:
+        logger.error(f"Failed to get AS{asn} prefixes: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao obter prefixos do AS{asn}: {str(e)}"
+        )
+
+
+@app.get("/peers/{asn}")
+async def get_as_peers(asn: int):
+    """Obtém peers de um ASN via RIPE API"""
+    try:
+        from app.services.ripe_api import ripe_api
+        peers = await ripe_api.get_peers(asn)
+        return peers
+    except Exception as e:
+        logger.error(f"Failed to get AS{asn} peers: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao obter peers do AS{asn}: {str(e)}"
+        )
 
 
 if __name__ == "__main__":
