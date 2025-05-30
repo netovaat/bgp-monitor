@@ -1,0 +1,38 @@
+BGP Monitor v2.1.1 - Pacote de Distribuição
+===========================================
+
+Data de Criação: Fri May 30 04:16:53 AM CEST 2025
+Versão: 2.1.1
+Ambiente: Produção
+
+Arquivos Incluídos:
+- Aplicação completa BGP Monitor
+- Scripts de instalação automatizados
+- Sistema de testes abrangente
+- Documentação completa
+- Changelog e notas de lançamento
+
+Scripts Principais:
+- install-v2.1.0-final.sh: Instalação completa automatizada
+- teste-final-v2.1.sh: Validação rápida do sistema
+- test-system-v2.1.sh: Testes completos
+- aplicar-correções.sh: Aplicação de correções
+- bgp-monitor.sh: Gerenciamento manual da aplicação
+
+Correções Incluídas na v2.1.1:
+- Serviço systemd funcional e persistente
+- Scripts bgp-monitor.sh corrigidos
+- Dependências completas no ambiente virtual
+- Pacote otimizado para distribuição
+
+Para instalar:
+1. Extrair o pacote: tar -xzf bgp-monitor-v2.1.1.tar.gz
+2. Executar: ./install-v2.1.0-final.sh
+3. Testar: ./teste-final-v2.1.sh
+
+Gerenciamento como serviço:
+- sudo systemctl start bgp-monitor
+- sudo systemctl status bgp-monitor
+- sudo journalctl -u bgp-monitor -f
+
+Suporte: Consulte README.md e docs/

@@ -33,3 +33,16 @@ __all__ = [
 ]
 
 __version__ = "2.0.0"
+# Compatibility function for get_db
+def get_db():
+    """
+    Compatibility function for dependency injection.
+    Returns database session generator.
+    """
+    from app.database.connection import db_manager
+    return db_manager.get_session()
+
+# Additional compatibility
+def get_db_session():
+    """Alternative name for get_db"""
+    return get_db()

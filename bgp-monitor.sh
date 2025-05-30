@@ -65,6 +65,13 @@ check_dependencies() {
 
 start_service() {
     echo "🚀 Iniciando BGP Monitor..."
+    
+    # Verificar se o ambiente virtual existe
+    if [[ ! -d "venv" ]]; then
+        echo "❌ Ambiente virtual não encontrado. Execute o script de instalação primeiro."
+        exit 1
+    fi
+    
     check_dependencies
     
     if pgrep -f "app.main" > /dev/null; then
@@ -77,8 +84,11 @@ start_service() {
         echo "⚠️  Arquivo .env não encontrado, usando configurações padrão"
     fi
     
+    echo "Ativando ambiente virtual..."
+    source venv/bin/activate
+    
     echo "Iniciando servidor..."
-    python3 -m app.main &
+    python -m app.main &
     echo $! > bgp-monitor.pid
     
     sleep 3

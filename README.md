@@ -1,10 +1,10 @@
-# BGP Monitor v2.1.0
+# BGP Monitor v2.1.1
 
 🚀 **Sistema avançado de monitoramento BGP com PostgreSQL e detecção de anomalias estatísticas**
 
 Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos dados BGP, armazene histórico por 1 ano e receba alertas inteligentes. Sistema completo com rate limiting otimizado para não ser bloqueado pela API RIPE.
 
-**✅ Versão 2.1.0 - Estável e Testada**
+**✅ Versão 2.1.1 - Estável e Testada**
 - Sistema de imports corrigido e validado
 - Documentação completa de instalação
 - Scripts automatizados de instalação e correção

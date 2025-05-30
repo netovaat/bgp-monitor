@@ -1,6 +1,6 @@
-# 📦 Instalação do BGP Monitor v2.1.0
+# 📦 Instalação do BGP Monitor v2.1.1
 
-Guia completo de instalação do BGP Monitor v2.1.0 com arquitetura PostgreSQL.
+Guia completo de instalação do BGP Monitor v2.1.1 com arquitetura PostgreSQL.
 
 ## 📋 Pré-requisitos
 

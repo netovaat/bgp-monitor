@@ -1,5 +1,24 @@
 # Changelog - BGP Monitor
 
+## [2.1.1] - 2025-05-30
+
+### 🚀 Novidades
+- **Serviço systemd funcionando**: BGP Monitor agora roda como serviço do sistema
+- **Scripts bgp-monitor.sh aprimorados**: Ativação automática do ambiente virtual
+- **Persistência garantida**: Aplicação continua rodando após fechar terminal
+- **Pacote final otimizado**: Distribuição pronta para produção
+
+### 🔧 Correções
+- **Script bgp-monitor.sh**: Agora ativa o ambiente virtual automaticamente
+- **Dependências completas**: Todas as dependências Python instaladas corretamente
+- **Serviço systemd**: Configuração e inicialização automática funcionando
+- **Ambiente virtual**: Instalação e ativação correta das dependências
+
+### 📦 Melhorias
+- **Distribuição**: Pacote final limpo e otimizado para distribuição
+- **Instalação**: Processo de instalação mais robusto e confiável
+- **Validação**: Sistema de testes completo funcionando
+
 ## [2.1.0] - 2024-12-29
 
 ### 🚀 Novidades
