@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_event():
     """Evento de inicialização"""
-    logger.info(f"Starting BGP Monitor v2.0.0 - Target ASN: {settings.target_asn}")
+    logger.info(f"Starting BGP Monitor v2.1.0 - Target ASN: {settings.target_asn}")
     
     # Inicializar banco de dados e scheduler
     await bgp_scheduler.initialize()
