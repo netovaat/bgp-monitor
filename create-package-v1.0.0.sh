@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # =============================================================================
-# BGP Monitor v2.2.0 - Script de Empacotamento
+# BGP Monitor v1.0.0 - Script de Empacotamento
 # =============================================================================
 # Autor: netovaat
 # GitHub: https://github.com/netovaat/bgp-monitor
 # 
-# Este script cria pacotes de distribuição otimizados para o BGP Monitor v2.2.0
+# Este script cria pacotes de distribuição otimizados para o BGP Monitor v1.0.0
 # =============================================================================
 
 set -e
@@ -14,7 +14,7 @@ set -e
 # -----------------------------------------------------------------------------
 # CONFIGURAÇÕES
 # -----------------------------------------------------------------------------
-readonly VERSION="2.2.0"
+readonly VERSION="1.0.0"
 readonly PROJECT_NAME="bgp-monitor"
 readonly SOURCE_DIR="/opt/bgp-monitor"
 readonly BUILD_DIR="/tmp/bgp-monitor-build"
@@ -190,7 +190,7 @@ validate_essential_files() {
         "app/main.py"
         "README.md"
         "CHANGELOG.md"
-        "RELEASE-NOTES-v2.2.0.md"
+        "RELEASE-NOTES-v1.0.0.md"
         "docs/INSTALLATION.md"
     )
     

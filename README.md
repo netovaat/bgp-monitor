@@ -1,11 +1,12 @@
-# BGP Monitor v2.2.0
+# BGP Monitor v1.0.0
 
 🚀 **Sistema avançado de monitoramento BGP com PostgreSQL e detecção de anomalias estatísticas**
 
 Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos dados BGP, armazene histórico por 1 ano e receba alertas inteligentes. Sistema completo com rate limiting otimizado para não ser bloqueado pela API RIPE.
 
-**✅ Versão 2.2.0 - Script de Instalação Unificado**
-- **S## 📚 **Documentação Completa**
+**✅ Versão 1.0.0 - Release Inicial**
+
+## 📚 **Documentação Completa**
 
 - [📖 Guia de Instalação](docs/INSTALLATION.md)
 - [⚙️ Configuração Detalhada](docs/CONFIGURATION.md)
@@ -14,11 +15,11 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 - [🏗️ Arquitetura do Sistema](docs/ARCHITECTURE.md)
 - [🔍 Troubleshooting](docs/TROUBLESHOOTING.md)
 
-## 🆕 **Novidades da v2.2.0**
+## 🆕 **Novidades da v1.0.0**
 
-### 🎯 **Script de Instalação Unificado**
-- **Um único script** substitui todos os scripts anteriores
-- **Processo robusto** com validações automáticas e recuperação de erros
+### 🎯 **Release Inicial Estável**
+- **Sistema completo** de monitoramento BGP pronto para produção
+- **Script de instalação unificado** com validações automáticas e recuperação de erros
 - **Logs coloridos** e informativos durante a instalação
 - **Testes automáticos** de conectividade e funcionalidade
 
@@ -28,16 +29,16 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 - **Comentários explicativos** detalhados para cada configuração
 - **Exemplos práticos** de configuração mínima e avançada
 
-### 🧹 **Otimização e Limpeza**
-- **Remoção de arquivos obsoletos** (10+ scripts antigos removidos)
-- **Código consolidado** e estrutura mais limpa
+### 🧹 **Estrutura Limpa e Otimizada**
+- **Código consolidado** e estrutura organizizada
 - **Dependências otimizadas** no ambiente virtual
-- **Performance melhorada** no processo de instalação
+- **Performance otimizada** no processo de instalação
+- **Arquitetura robusta** para ambiente de produção
 
-### 🔧 **Melhorias Técnicas**
-- **Autor atualizado** para `netovaat` 
-- **Compatibilidade mantida** com todas as funcionalidades da v2.1.1
-- **Sistema de logs** aprimorado durante instalação
+### 🔧 **Funcionalidades Técnicas**
+- **Autor**: `netovaat` 
+- **API REST completa** com documentação automática
+- **Sistema de logs** detalhado durante instalação
 - **Validações robustas** de sistema e dependências
 
 ## ✨ Principais Funcionalidades
@@ -70,26 +71,24 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    BGP Monitor v2.0                        │
+│                    BGP Monitor v1.0                         │
 ├─────────────────────────────────────────────────────────────┤
-│  🌐 API REST (FastAPI)     │  📊 Dashboard & Endpoints      │
-│  ⏰ Scheduler              │  🔄 Coletas Automáticas        │
-│  🎯 ASN Manager            │  ⚙️ Configuração Multi-ASN     │
-│  📈 Anomaly Detector       │  🧮 Análise Estatística        │
-│  💾 Database Layer         │  🐘 PostgreSQL + Alembic       │
-│  🔌 RIPE API Client        │  🌍 Rate Limiting Inteligente  │
-│  📱 Telegram Alerts        │  🇧🇷 Mensagens em Português    │
+│  🌐 API REST (FastAPI)     │  📊 Dashboard & Endpoints     │
+│  ⏰ Scheduler              │  🔄 Coletas Automáticas       │
+│  🎯 ASN Manager            │  ⚙️ Configuração Multi-ASN    │
+│  📈 Anomaly Detector       │  🧮 Análise Estatística       │
+│  💾 Database Layer         │  🐘 PostgreSQL + Alembic      │
+│  🔌 RIPE API Client        │  🌍 Rate Limiting Inteligente │
+│  📱 Telegram Alerts        │  🇧🇷 Mensagens em Português     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## 🚀 **Instalação Rápida (Ubuntu/Debian)**
 
-### **Instalação Automatizada com Script Unificado**
-
-A versão 2.2.0 introduz um **script de instalação único** que substitui todos os scripts anteriores e oferece um processo simplificado e robusto:
+### **Instalação Automatizada com Script**
 
 ```bash
-# 1. Baixar e executar o script de instalação unificado
+# 1. Baixar e executar o script de instalação
 cd /opt
 sudo git clone https://github.com/netovaat/bgp-monitor.git
 cd bgp-monitor
@@ -105,9 +104,9 @@ sudo systemctl start bgp-monitor
 sudo systemctl status bgp-monitor
 ```
 
-### **Funcionalidades do Script de Instalação Unificado**
+### **Funcionalidades do Script de Instalação**
 
-O novo `install.sh` inclui:
+O script `install.sh` inclui:
 - ✅ **Validação completa** de sistema e dependências
 - ✅ **Instalação automática** de PostgreSQL e Redis
 - ✅ **Configuração de ambiente** Python virtual otimizado
@@ -126,15 +125,18 @@ sudo apt update && sudo apt upgrade -y
 
 # Instalar dependências básicas
 sudo apt install -y \
-    python3.11 \
-    python3.11-venv \
-    python3.11-dev \
-    postgresql-15 \
-    postgresql-client-15 \
-    postgresql-contrib-15 \
+    python3 \
+    python3-venv \
+    python3-dev \
+    postgresql \
+    postgresql-client \
+    postgresql-contrib \
     git \
     curl \
-    build-essential
+    build-essential \
+    jq \
+    zip \
+    whois
 
 # Iniciar PostgreSQL
 sudo systemctl start postgresql
@@ -160,7 +162,7 @@ sudo chown -R bgpmonitor:bgpmonitor /opt/bgp-monitor
 
 # Criar ambiente virtual
 cd /opt/bgp-monitor
-sudo -u bgpmonitor python3.11 -m venv venv
+sudo -u bgpmonitor python3 -m venv venv
 
 # Instalar dependências Python
 sudo -u bgpmonitor bash -c "
@@ -184,7 +186,7 @@ sudo -u bgpmonitor bash -c "
 
 ### **Configuração Completa com .env.example**
 
-A versão 2.2.0 inclui um arquivo `.env.example` **completamente documentado** com todas as variáveis de configuração disponíveis:
+O BGP Monitor v1.0.0 inclui um arquivo `.env.example` **completamente documentado** com todas as variáveis de configuração disponíveis:
 
 ```bash
 # Copiar e editar configurações
@@ -235,30 +237,61 @@ CLEANUP_INTERVAL_HOURS=24        # Limpeza diária
 LOG_LEVEL=INFO
 ```
 
+## ✅ **Sistema Funcionando Corretamente!**
+
+O **BGP Monitor v1.0.0** está instalado e funcionando. Aqui estão alguns testes para verificar:
+
+```bash
+# ✅ Verificar status geral
+curl -s http://localhost:8000/health | jq
+
+# ✅ Dashboard com informações dos ASNs
+curl -s http://localhost:8000/api/v1/bgp/overview | jq
+
+# ✅ Listar ASNs cadastrados
+curl -s http://localhost:8000/api/v1/bgp/asns | jq
+
+# ✅ Coletar dados de um ASN (exemplo com AS64512)
+curl -X POST "http://localhost:8000/api/v1/bgp/asns/64512/collect"
+
+# ✅ Ver estatísticas após a coleta
+curl -s http://localhost:8000/api/v1/bgp/asns/64512/statistics | jq
+
+# ✅ Verificar anomalias detectadas
+curl -s http://localhost:8000/api/v1/bgp/asns/64512/anomalies | jq
+```
+
 ### **Configurar ASNs para Monitoramento**
 
 Via API REST:
 ```bash
 # Adicionar ASN individual
-curl -X POST "http://localhost:8000/asns" \
+curl -X POST "http://localhost:8000/api/v1/bgp/asns" \
   -H "Content-Type: application/json" \
   -d '{
     "asn": 64512,
     "name": "Minha Empresa",
-    "description": "ASN principal",
+    "description": "ASN principal da rede",
     "enabled": true
   }'
 
-# Adicionar múltiplos ASNs
-curl -X POST "http://localhost:8000/asns/batch" \
+# Listar ASNs configurados
+curl -X GET "http://localhost:8000/api/v1/bgp/asns"
+
+# Obter detalhes de um ASN específico
+curl -X GET "http://localhost:8000/api/v1/bgp/asns/64512"
+
+# Atualizar ASN
+curl -X PUT "http://localhost:8000/api/v1/bgp/asns/64512" \
   -H "Content-Type: application/json" \
   -d '{
-    "asns": [
-      {"asn": 15169, "name": "Google", "enabled": true},
-      {"asn": 32934, "name": "Facebook", "enabled": true},
-      {"asn": 13335, "name": "Cloudflare", "enabled": false}
-    ]
+    "name": "Minha Empresa Atualizada",
+    "description": "ASN principal da rede corporativa",
+    "enabled": true
   }'
+
+# Remover ASN
+curl -X DELETE "http://localhost:8000/api/v1/bgp/asns/64512"
 ```
 
 ## 🏃 **Execução em Background**
@@ -308,27 +341,25 @@ ps aux | grep main.py
 curl -s http://localhost:8000/health | jq
 
 # Dashboard geral
-curl -s http://localhost:8000/dashboard | jq
+curl -s http://localhost:8000/api/v1/bgp/overview | jq
 
 # Status do scheduler
-curl -s http://localhost:8000/scheduler/status | jq
+curl -s http://localhost:8000/api/v1/scheduler/status | jq
 
 # Listar ASNs configurados
-curl -s http://localhost:8000/asns | jq
+curl -s http://localhost:8000/api/v1/bgp/asns | jq
 ```
 
 ### **Coleta de Dados**
 ```bash
 # Forçar coleta de todos os ASNs
-curl -X POST "http://localhost:8000/collect/force"
+curl -X POST "http://localhost:8000/api/v1/bgp/collect/force"
 
 # Coleta de ASN específico
-curl -X POST "http://localhost:8000/collect/force" \
-  -H "Content-Type: application/json" \
-  -d '{"asn": 64512}'
+curl -X POST "http://localhost:8000/api/v1/bgp/asns/64512/collect"
 
-# Verificar última coleta
-curl -s "http://localhost:8000/dashboard" | jq '.last_collection'
+# Verificar última coleta (overview geral)
+curl -s "http://localhost:8000/api/v1/bgp/overview" | jq '.last_collection'
 ```
 
 ### **Gestão do Banco de Dados**
@@ -347,20 +378,23 @@ curl -s "http://localhost:8000/metrics" | jq '.database_stats'
 
 ### **Endpoints Principais**
 ```bash
-# Dashboard geral
-curl http://localhost:8000/dashboard
+# Dashboard geral (overview)
+curl http://localhost:8000/api/v1/bgp/overview
 
-# Dados históricos de ASN
-curl http://localhost:8000/historical/64512
+# Dados históricos/estatísticas de ASN
+curl http://localhost:8000/api/v1/bgp/asns/64512/statistics
 
-# Anomalias detectadas
-curl http://localhost:8000/anomalies
+# Anomalias detectadas para ASN
+curl http://localhost:8000/api/v1/bgp/asns/64512/anomalies
 
-# Estatísticas do sistema
-curl http://localhost:8000/metrics
+# Mudanças recentes de ASN
+curl http://localhost:8000/api/v1/bgp/asns/64512/changes
 
 # Gestão de ASNs
-curl http://localhost:8000/asns
+curl http://localhost:8000/api/v1/bgp/asns
+
+# Métricas do sistema
+curl http://localhost:8000/metrics
 ```
 
 ### **Documentação Interativa**
@@ -408,7 +442,7 @@ curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getMe" | jq
 # Testar via API
 curl -X POST "http://localhost:8000/test/telegram" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Teste BGP Monitor v2.0"}'
+  -d '{"message": "Teste BGP Monitor v1.0"}'
 ```
 
 ## 📈 **Monitoramento e Métricas**
@@ -422,7 +456,7 @@ curl -s http://localhost:8000/metrics | jq
 curl -s http://localhost:8000/metrics | jq '.collection_performance'
 
 # Estatísticas de anomalias
-curl -s http://localhost:8000/anomalies/stats | jq
+curl -s http://localhost:8000/api/v1/bgp/overview | jq '.anomaly_summary'
 ```
 
 ### **Logs Estruturados**
@@ -466,4 +500,4 @@ Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICEN
 
 ---
 
-**BGP Monitor v2.0** - Monitoramento BGP profissional com PostgreSQL 🚀
+**BGP Monitor v1.0.0** - Monitoramento BGP profissional com PostgreSQL 🚀

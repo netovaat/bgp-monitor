@@ -1,10 +1,10 @@
 # 🏗️ Arquitetura
 
-Documentação detalhada da arquitetura do BGP Monitor v2.0.
+Documentação detalhada da arquitetura do BGP Monitor v1.0.0.
 
 ## 🎯 Visão Geral
 
-O BGP Monitor v2.0 foi projetado como **sistema robusto de produção** com arquitetura escalável, priorizando:
+O BGP Monitor v1.0.0 foi projetado como **sistema robusto de produção** com arquitetura escalável, priorizando:
 
 - **Persistência**: PostgreSQL para dados históricos confiáveis
 - **Escalabilidade**: Suporte a múltiplos ASNs simultaneamente
@@ -12,7 +12,7 @@ O BGP Monitor v2.0 foi projetado como **sistema robusto de produção** com arqu
 - **Confiabilidade**: Rate limiting e recuperação de falhas
 - **Observabilidade**: Logs, métricas e alertas avançados
 
-## 📋 Princípios de Design v2.0
+## 📋 Princípios de Design v1.0.0
 
 ### 1. **Production-Ready Architecture**
 - PostgreSQL para persistência de dados
@@ -38,11 +38,11 @@ O BGP Monitor v2.0 foi projetado como **sistema robusto de produção** com arqu
 - Logs estruturados para auditoria
 - Dashboard em tempo real
 
-## 🏛️ Arquitetura de Alto Nível v2.0
+## 🏛️ Arquitetura de Alto Nível v1.0.0
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    BGP Monitor v2.0                        │
+│                    BGP Monitor v1.0.0                      │
 ├─────────────────────────────────────────────────────────────┤
 │  🌐 API Layer      │  📊 Analytics    │  🔔 Alerting       │
 │  ├─ REST API       │  ├─ Dashboard    │  ├─ Telegram Bot   │
@@ -60,7 +60,7 @@ O BGP Monitor v2.0 foi projetado como **sistema robusto de produção** com arqu
 │  └─ Resilience     │  └─ Migrations   │  └─ Log Rotation   │
 ```
 
-## 📁 Estrutura de Diretórios v2.0
+## 📁 Estrutura de Diretórios v1.0.0
 
 ```
 bgp-monitor/
@@ -115,7 +115,7 @@ bgp-monitor/
 └── README.md                     # Documentação principal
 ```
 
-## 🔧 Componentes Principais v2.0
+## 🔧 Componentes Principais v1.0.0
 
 ### 1. **Application Core (app/main.py)**
 

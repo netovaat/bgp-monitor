@@ -130,6 +130,7 @@ install_system_packages() {
         git curl wget htop
         build-essential libpq-dev pkg-config
         nginx supervisor
+        jq zip whois
     )
     
     log_info "Instalando: ${packages[*]}"

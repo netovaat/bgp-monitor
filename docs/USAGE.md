@@ -1,6 +1,6 @@
 # 🔧 Guia de Uso
 
-Guia completo para usar o BGP Monitor v2.0 com PostgreSQL no dia a dia.
+Guia completo para usar o BGP Monitor v1.0.0 com PostgreSQL no dia a dia.
 
 ## 🚀 Iniciando o Sistema
 

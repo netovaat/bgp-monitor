@@ -1,15 +1,15 @@
 # ⚙️ Configuração
 
-Guia completo de configuração do BGP Monitor v2.0 com PostgreSQL.
+Guia completo de configuração do BGP Monitor v1.0.0 com PostgreSQL.
 
 ## 📄 Arquivo .env
 
-O BGP Monitor v2.0 usa um arquivo `.env` para todas as configurações do sistema.
+O BGP Monitor v1.0.0 usa um arquivo `.env` para todas as configurações do sistema.
 
 ### Configuração Básica
 
 ```bash
-# BGP Monitor v2.0 Configuration
+# BGP Monitor v1.0.0 Configuration
 
 # === DATABASE CONFIGURATION ===
 DB_HOST=localhost
@@ -101,7 +101,7 @@ psql -h localhost -U bgp_monitor bgp_monitor < backup_20231201.sql
 
 1. Acesse [@BotFather](https://t.me/BotFather) no Telegram
 2. Envie `/newbot`
-3. Escolha um nome para seu bot (ex: "BGP Monitor v2.0")
+3. Escolha um nome para seu bot (ex: "BGP Monitor v1.0.0")
 4. Escolha um username (ex: "meu_bgp_monitor_v2_bot")
 5. Copie o token fornecido
 
@@ -129,7 +129,7 @@ curl -s "https://api.telegram.org/botSEU_BOT_TOKEN/getUpdates" | grep -o '"id":[
 # Testar envio de mensagem via API
 curl -X POST "http://localhost:8000/test/telegram" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Teste do BGP Monitor v2.0"}'
+  -d '{"message": "Teste do BGP Monitor v1.0.0"}'
 ```
 
 ## 🌐 Configuração de ASNs para Monitoramento
@@ -415,7 +415,7 @@ O sistema envia automaticamente:
 ### Exemplo .env para Produção
 
 ```bash
-# === BGP Monitor v2.0 Production Configuration ===
+# === BGP Monitor v1.0.0 Production Configuration ===
 
 # === DATABASE ===
 DB_HOST=localhost
@@ -480,7 +480,7 @@ curl -s http://localhost:8000/health | jq
 # Testar Telegram
 curl -X POST "http://localhost:8000/test/telegram" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Teste de configuração BGP Monitor v2.0"}'
+  -d '{"message": "Teste de configuração BGP Monitor v1.0.0"}'
 ```
 
 ### Validar ASNs Configurados

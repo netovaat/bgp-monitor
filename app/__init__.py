@@ -1,7 +1,7 @@
 """
-BGP Monitor v2.2.0 - Sistema de Monitoramento BGP com PostgreSQL
+BGP Monitor v1.0.0 - Sistema de Monitoramento BGP com PostgreSQL
 
-Este módulo contém a aplicação principal do BGP Monitor v2.2.0,
+Este módulo contém a aplicação principal do BGP Monitor v1.0.0,
 incluindo APIs, serviços de coleta, detecção de anomalias e 
 notificações via Telegram.
 
@@ -15,17 +15,18 @@ Arquitetura:
 Desenvolvido para monitoramento de até 50 ASNs simultaneamente
 com detecção de anomalias em tempo real.
 
-Changelog v2.2.0:
-- Script de instalação unificado e otimizado
-- Documentação completamente revisada e atualizada
-- Remoção de scripts obsoletos e redundantes
-- Configurações padronizadas e validadas
-- Sistema de empacotamento aprimorado
-- Suporte completo a flags de configuração
-- Melhorias na estrutura de arquivos
-- Processo de instalação simplificado
+Release Inicial v1.0.0:
+- Sistema completo de monitoramento BGP multi-ASN
+- Detecção de anomalias estatísticas com Z-score
+- Armazenamento histórico em PostgreSQL
+- Alertas via Telegram em português
+- Rate limiting inteligente para API RIPE
+- Scheduler automático a cada 15 minutos
+- API REST completa com FastAPI
+- Script de instalação automatizado
+- Documentação completa e exemplos práticos
 """
 
-__version__ = "2.2.0"
+__version__ = "1.0.0"
 __author__ = "netovaat"
 __description__ = "Sistema de Monitoramento BGP com PostgreSQL"

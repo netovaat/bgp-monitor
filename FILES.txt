@@ -1,8 +1,9 @@
-# Lista de arquivos incluídos no pacote v2.2.0
+# Lista de arquivos incluídos no pacote v1.0.0
 ./alembic/env.py
 ./alembic.ini
 ./alembic/script.py.mako
 ./alembic/versions/001_initial_migration.py
+./API-QUICKSTART.md
 ./app/api/bgp_historical.py
 ./app/api/__init__.py
 ./app/api/main.py
@@ -32,11 +33,12 @@
 ./app/services/telegram.py
 ./app/utils/__init__.py
 ./app/utils/metrics.py
+./asn_config.json
 ./bgp-monitor.sh
 ./CHANGELOG.md
 ./CHECKSUMS.txt
 ./CONTRIBUTING.md
-./create-package-v2.2.0.sh
+./create-package-v1.0.0.sh
 ./docs/API.md
 ./docs/ARCHITECTURE.md
 ./docs/CONFIGURATION.md
@@ -48,7 +50,6 @@
 ./install.sh
 ./LICENSE
 ./README.md
-./RELEASE-NOTES-v2.2.0.md
+./RELEASE-NOTES-v1.0.0.md
 ./requirements.txt
-./UPGRADE-SUMMARY-v2.2.0.md
 ./VERSION.txt

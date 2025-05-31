@@ -1,0 +1,23 @@
+{
+  "last_updated": "2025-05-31T06:03:55.864569",
+  "asns": [
+    {
+      "asn": 267357,
+      "name": "AS267357",
+      "description": "ASN configurado automaticamente das configura\u00e7\u00f5es",
+      "monitoring_enabled": true,
+      "alert_enabled": true,
+      "custom_thresholds": {},
+      "added_date": "2025-05-31T03:18:41.671187"
+    },
+    {
+      "asn": 64512,
+      "name": "Minha Empresa",
+      "description": "ASN principal da rede",
+      "monitoring_enabled": true,
+      "alert_enabled": true,
+      "custom_thresholds": {},
+      "added_date": "2025-05-31T06:03:55.864436"
+    }
+  ]
+}

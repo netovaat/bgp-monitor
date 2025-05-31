@@ -1,6 +1,6 @@
-# 🛠️ Guia de Solução de Problemas - BGP Monitor v2.0
+# 🛠️ Guia de Solução de Problemas - BGP Monitor v1.0.0
 
-Este guia abrangente ajuda a resolver problemas do BGP Monitor v2.0 com PostgreSQL e detecção de anomalias.
+Este guia abrangente ajuda a resolver problemas do BGP Monitor v1.0.0 com PostgreSQL e detecção de anomalias.
 
 ## 🔧 Problemas de Inicialização
 
@@ -143,7 +143,7 @@ sudo systemctl restart postgresql
 #### **Erro: "Deadlock detected"**
 ```bash
 # Verificar logs PostgreSQL para deadlocks
-sudo tail -f /var/log/postgresql/postgresql-15-main.log | grep -i deadlock
+sudo tail -f /var/log/postgresql/postgresql-main.log | grep -i deadlock
 
 # Analisar queries lentas
 sudo -u postgres psql bgp_monitor -c "
@@ -432,7 +432,7 @@ curl http://localhost:8000/test/validate-config
 ```bash
 #!/bin/bash
 # Script de coleta de debug
-echo "=== BGP Monitor v2.0 Debug Info ===" > debug_info.txt
+echo "=== BGP Monitor v1.0.0 Debug Info ===" > debug_info.txt
 echo "Timestamp: $(date)" >> debug_info.txt
 echo "" >> debug_info.txt
 
@@ -467,7 +467,7 @@ echo "Debug info collected in debug_info.txt"
 
 ---
 
-**BGP Monitor v2.0** - Sistema robusto com ferramentas completas de diagnóstico e recuperação.
+**BGP Monitor v1.0.0** - Sistema robusto com ferramentas completas de diagnóstico e recuperação.
 
 #### Erro: "IRR validation failed"
 ```bash

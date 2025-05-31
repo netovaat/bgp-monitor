@@ -1,13 +1,13 @@
 # 🌐 Referência da API
 
-Documentação completa da API REST do BGP Monitor v2.0.
+Documentação completa da API REST do BGP Monitor v1.0.0.
 
 ## 📋 Visão Geral
 
 - **Base URL**: `http://localhost:8000`
 - **Formato**: JSON
 - **Autenticação**: Não requerida (local)
-- **Versionamento**: v2.0
+- **Versionamento**: v1.0.0
 - **Documentação Interativa**: 
   - Swagger UI: http://localhost:8000/docs
   - ReDoc: http://localhost:8000/redoc
@@ -25,7 +25,7 @@ Verificação de saúde do sistema.
   "status": "healthy",
   "timestamp": "2025-05-28T10:00:00Z",
   "uptime_seconds": 86400,
-  "version": "2.0.0",
+  "version": "1.0.0",
   "database_connected": true,
   "scheduler_running": true,
   "asns_monitored": 52,
@@ -247,7 +247,7 @@ Exporta configuração de todos os ASNs.
 **Resposta:**
 ```json
 {
-  "version": "2.0",
+  "version": "1.0.0",
   "exported_at": "2025-05-28T10:00:00Z",
   "asns": [
     {
@@ -680,7 +680,7 @@ Envia uma mensagem de teste para verificar funcionamento.
   "message_id": 12345,
   "sent_at": "2025-05-28T10:05:00Z",
   "delivery_time": 1.2,
-  "message_preview": "🧪 TESTE BGP Monitor v2.0..."
+  "message_preview": "🧪 TESTE BGP Monitor v1.0.0..."
 }
 ```
 
@@ -743,7 +743,7 @@ Informações detalhadas do sistema.
 **Resposta:**
 ```json
 {
-  "version": "2.0.0",
+  "version": "1.0.0",
   "uptime": 172800,
   "python_version": "3.11.4",
   "system": {
@@ -832,7 +832,7 @@ Exporta configuração completa do sistema.
 **Resposta:**
 ```json
 {
-  "version": "2.0.0",
+  "version": "1.0.0",
   "exported_at": "2025-05-28T10:10:00Z",
   "asns": [
     {
@@ -995,4 +995,4 @@ curl -X POST http://localhost:8000/test/ripe-api \
 
 ---
 
-**BGP Monitor v2.0** - Sistema completo de monitoramento BGP com PostgreSQL e detecção de anomalias.
+**BGP Monitor v1.0.0** - Sistema completo de monitoramento BGP com PostgreSQL e detecção de anomalias.

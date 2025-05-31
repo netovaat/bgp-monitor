@@ -1,54 +1,53 @@
 # Changelog - BGP Monitor
 
-## [2.2.0] - 2025-01-12
+## [1.0.0] - 2025-01-12
 
-### 🚀 Novidades
-- **Script de instalação unificado**: Novo `install.sh` único que substitui todos os scripts anteriores
-- **Documentação de configuração completa**: Arquivo `.env.example` totalmente documentado com 25+ variáveis
-- **Processo de instalação robusto**: Validações automáticas, logs coloridos e recuperação de erros
-- **Limpeza estrutural**: Remoção de 10+ arquivos obsoletos e otimização da estrutura do projeto
+### 🚀 Release Inicial
+Esta é a primeira versão estável do BGP Monitor, um sistema completo de monitoramento BGP com API REST, dashboard web e coleta automatizada de dados.
 
-### 🔧 Melhorias
-- **Script install.sh único**: Processo simplificado com validação completa de sistema e dependências
-- **Documentação .env.example**: Todas as flags de configuração documentadas com comentários explicativos
-- **Logs de instalação**: Sistema de logging colorido e informativo durante o processo
-- **Validações robustas**: Testes automáticos de conectividade PostgreSQL, Redis e APIs
-- **Recuperação de erros**: Sistema inteligente de detecção e correção de problemas
+### 🎯 Funcionalidades Principais
+- **Monitoramento BGP completo**: Coleta automatizada de informações de ASNs via RIPEstat API
+- **API REST robusta**: Interface completa para gerenciar ASNs e consultar dados históricos
+- **Dashboard interativo**: Interface web para visualização de dados e estatísticas
+- **Banco de dados PostgreSQL**: Armazenamento persistente com suporte a consultas complexas
+- **Cache Redis**: Sistema de cache para otimização de performance
+- **Coleta agendada**: Scheduler automático para coleta periódica de dados
+- **Serviço systemd**: Execução como serviço do sistema operacional
 
-### 📦 Otimizações
-- **Código limpo**: Remoção de scripts obsoletos (aplicar-correções.sh, fix-*.sh, install-v2.1.*.sh)
-- **Documentação atualizada**: README.md e docs/ atualizados para v2.2.0
-- **Estrutura organizada**: Projeto mais limpo e fácil de manter
-- **Performance**: Otimizações no processo de instalação e configuração
+### 🔧 Componentes Técnicos
+- **FastAPI**: Framework web moderno para API REST
+- **SQLAlchemy**: ORM para gerenciamento de banco de dados
+- **Alembic**: Sistema de migrações de banco de dados
+- **APScheduler**: Agendador de tarefas para coleta automática
+- **Redis**: Sistema de cache distribuído
+- **PostgreSQL**: Banco de dados relacional principal
 
-### 🗑️ Arquivos Removidos
-- Scripts obsoletos: `aplicar-correções.sh`, `create-package-v2.1.0*.sh`, `fix-*.sh`, `install-v2.1.*.sh`
-- Documentação desatualizada: `CORREÇÕES-INSTALAÇÃO.md`, `README_v2.md`, `RELEASE-NOTES-v2.0.md`
-- Arquivos temporários: logs, cache Python, arquivos PID
+### 📦 Scripts de Instalação
+- **install.sh**: Script de instalação unificado com validações automáticas
+- **Configuração .env**: Arquivo de exemplo com todas as variáveis documentadas
+- **Serviço systemd**: Configuração automática para execução como serviço
+- **Ambiente virtual**: Isolamento de dependências Python
 
-### 👨‍💻 Técnico
-- **Autor atualizado**: Metadados atualizados para `netovaat`
-- **Versão consolidada**: Todas as funcionalidades da v2.1.1 mantidas
-- **Ambiente virtual**: Configuração otimizada e validada
-- **Compatibilidade**: Totalmente compatível com configurações existentes
+### 🌐 API Endpoints
+- `/api/v1/bgp/asns` - Gerenciamento de ASNs
+- `/api/v1/bgp/overview` - Dashboard principal
+- `/api/v1/bgp/collect/force` - Coleta forçada de dados
+- `/api/v1/metrics` - Métricas do sistema
+- `/health` - Status de saúde da aplicação
 
-## [2.1.1] - 2025-05-30
+### 🔍 Recursos de Monitoramento
+- **Coleta automática**: Dados atualizados periodicamente
+- **Histórico completo**: Armazenamento de dados históricos para análise
+- **Detecção de anomalias**: Identificação de mudanças significativas
+- **Alertas configuráveis**: Sistema de notificações personalizáveis
+- **Métricas detalhadas**: Estatísticas completas de performance
 
-### 🚀 Novidades
-- **Serviço systemd funcionando**: BGP Monitor agora roda como serviço do sistema
-- **Scripts bgp-monitor.sh aprimorados**: Ativação automática do ambiente virtual
-- **Persistência garantida**: Aplicação continua rodando após fechar terminal
-- **Pacote final otimizado**: Distribuição pronta para produção
-
-### 🔧 Correções
-- **Script bgp-monitor.sh**: Agora ativa o ambiente virtual automaticamente
-- **Dependências completas**: Todas as dependências Python instaladas corretamente
-- **Serviço systemd**: Configuração e inicialização automática funcionando
-- **Ambiente virtual**: Instalação e ativação correta das dependências
-
-### 📦 Melhorias
-- **Distribuição**: Pacote final limpo e otimizado para distribuição
-- **Instalação**: Processo de instalação mais robusto e confiável
+### 👨‍💻 Informações Técnicas
+- **Autor**: netovaat
+- **Versão**: 1.0.0
+- **Compatibilidade**: Ubuntu 20.04+, Debian 10+
+- **Python**: 3.8+
+- **Licença**: MIT
 - **Validação**: Sistema de testes completo funcionando
 
 ## [2.1.0] - 2024-12-29

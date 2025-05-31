@@ -1,6 +1,6 @@
-# 📦 Instalação do BGP Monitor v2.2.0
+# 📦 Instalação do BGP Monitor v1.0.0
 
-Guia completo de instalação do BGP Monitor v2.2.0 com **script de instalação unificado** e documentação de configuração completa.
+Guia completo de instalação do BGP Monitor v1.0.0 com **script de instalação unificado** e documentação de configuração completa.
 
 ## 📋 Pré-requisitos
 
@@ -20,7 +20,7 @@ Guia completo de instalação do BGP Monitor v2.2.0 com **script de instalação
 
 ### Novo Script de Instalação Único
 
-A versão 2.2.0 introduz um **script de instalação unificado** que substitui todos os scripts anteriores:
+A versão 1.0.0 introduz um **script de instalação unificado** que simplifica todo o processo:
 
 ```bash
 # 1. Clonar ou extrair o projeto
@@ -46,7 +46,7 @@ sudo systemctl status bgp-monitor
 O novo `install.sh` oferece:
 
 - ✅ **Validação completa** do sistema operacional e dependências
-- ✅ **Instalação automática** de PostgreSQL 15 e Redis
+- ✅ **Instalação automática** de PostgreSQL e Redis
 - ✅ **Configuração de usuários** e bancos de dados
 - ✅ **Ambiente Python virtual** otimizado
 - ✅ **Migrações Alembic** automáticas
@@ -60,7 +60,7 @@ O novo `install.sh` oferece:
 
 ### Documentação de Configuração Detalhada
 
-A versão 2.2.0 inclui um arquivo `.env.example` **completamente documentado** com todas as variáveis de configuração:
+A versão 1.0.0 inclui um arquivo `.env.example` **completamente documentado** com todas as variáveis de configuração:
 
 ```bash
 # Copiar arquivo de exemplo
@@ -152,7 +152,7 @@ sudo usermod -aG sudo bgpmonitor
 ```bash
 # Extrair para diretório correto
 sudo mkdir -p /opt
-sudo tar -xzf bgp-monitor-v2.0-final.tar.gz -C /opt/
+sudo tar -xzf bgp-monitor-v1.0.0.tar.gz -C /opt/
 sudo chown -R bgpmonitor:bgpmonitor /opt/bgp-monitor
 ```
 
@@ -249,7 +249,7 @@ sudo -u bgpmonitor python3 setup_asns.py
 # Criar arquivo de serviço systemd
 sudo tee /etc/systemd/system/bgp-monitor.service << EOF
 [Unit]
-Description=BGP Monitor v2.0
+Description=BGP Monitor v1.0.0
 After=network.target postgresql.service
 Requires=postgresql.service
 
@@ -462,7 +462,7 @@ sudo systemctl stop bgp-monitor
 sudo -u postgres pg_dump bgpmonitor > /tmp/bgp-backup-$(date +%Y%m%d).sql
 
 # Extrair nova versão
-sudo tar -xzf bgp-monitor-vX.X.X.tar.gz -C /opt/
+sudo tar -xzf bgp-monitor-v1.0.0.tar.gz -C /opt/
 sudo chown -R bgpmonitor:bgpmonitor /opt/bgp-monitor
 
 # Atualizar dependências
@@ -520,6 +520,6 @@ Para problemas não cobertos neste guia:
 
 ---
 
-**Versão**: 2.0 Final  
+**Versão**: 1.0.0 Final  
 **Compatibilidade**: Ubuntu 20.04+ / Debian 10+ / Python 3.8+  
-**Última atualização**: Dezembro 2024
+**Última atualização**: Janeiro 2025
