@@ -1,5 +1,37 @@
 # Changelog - BGP Monitor
 
+## [2.2.0] - 2025-01-12
+
+### 🚀 Novidades
+- **Script de instalação unificado**: Novo `install.sh` único que substitui todos os scripts anteriores
+- **Documentação de configuração completa**: Arquivo `.env.example` totalmente documentado com 25+ variáveis
+- **Processo de instalação robusto**: Validações automáticas, logs coloridos e recuperação de erros
+- **Limpeza estrutural**: Remoção de 10+ arquivos obsoletos e otimização da estrutura do projeto
+
+### 🔧 Melhorias
+- **Script install.sh único**: Processo simplificado com validação completa de sistema e dependências
+- **Documentação .env.example**: Todas as flags de configuração documentadas com comentários explicativos
+- **Logs de instalação**: Sistema de logging colorido e informativo durante o processo
+- **Validações robustas**: Testes automáticos de conectividade PostgreSQL, Redis e APIs
+- **Recuperação de erros**: Sistema inteligente de detecção e correção de problemas
+
+### 📦 Otimizações
+- **Código limpo**: Remoção de scripts obsoletos (aplicar-correções.sh, fix-*.sh, install-v2.1.*.sh)
+- **Documentação atualizada**: README.md e docs/ atualizados para v2.2.0
+- **Estrutura organizada**: Projeto mais limpo e fácil de manter
+- **Performance**: Otimizações no processo de instalação e configuração
+
+### 🗑️ Arquivos Removidos
+- Scripts obsoletos: `aplicar-correções.sh`, `create-package-v2.1.0*.sh`, `fix-*.sh`, `install-v2.1.*.sh`
+- Documentação desatualizada: `CORREÇÕES-INSTALAÇÃO.md`, `README_v2.md`, `RELEASE-NOTES-v2.0.md`
+- Arquivos temporários: logs, cache Python, arquivos PID
+
+### 👨‍💻 Técnico
+- **Autor atualizado**: Metadados atualizados para `netovaat`
+- **Versão consolidada**: Todas as funcionalidades da v2.1.1 mantidas
+- **Ambiente virtual**: Configuração otimizada e validada
+- **Compatibilidade**: Totalmente compatível com configurações existentes
+
 ## [2.1.1] - 2025-05-30
 
 ### 🚀 Novidades

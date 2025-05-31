@@ -1,15 +1,44 @@
-# BGP Monitor v2.1.1
+# BGP Monitor v2.2.0
 
 🚀 **Sistema avançado de monitoramento BGP com PostgreSQL e detecção de anomalias estatísticas**
 
 Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos dados BGP, armazene histórico por 1 ano e receba alertas inteligentes. Sistema completo com rate limiting otimizado para não ser bloqueado pela API RIPE.
 
-**✅ Versão 2.1.1 - Estável e Testada**
-- Sistema de imports corrigido e validado
-- Documentação completa de instalação
-- Scripts automatizados de instalação e correção
-- Ambiente virtual otimizado
-- Testes funcionais implementados
+**✅ Versão 2.2.0 - Script de Instalação Unificado**
+- **S## 📚 **Documentação Completa**
+
+- [📖 Guia de Instalação](docs/INSTALLATION.md)
+- [⚙️ Configuração Detalhada](docs/CONFIGURATION.md)
+- [🔧 Guia de Uso](docs/USAGE.md)
+- [🌐 Referência da API](docs/API.md)
+- [🏗️ Arquitetura do Sistema](docs/ARCHITECTURE.md)
+- [🔍 Troubleshooting](docs/TROUBLESHOOTING.md)
+
+## 🆕 **Novidades da v2.2.0**
+
+### 🎯 **Script de Instalação Unificado**
+- **Um único script** substitui todos os scripts anteriores
+- **Processo robusto** com validações automáticas e recuperação de erros
+- **Logs coloridos** e informativos durante a instalação
+- **Testes automáticos** de conectividade e funcionalidade
+
+### 📖 **Documentação de Configuração Completa**
+- **`.env.example` documentado** com todas as 25+ variáveis disponíveis
+- **Seções organizadas** por funcionalidade (Database, Cache, BGP, Alertas, etc.)
+- **Comentários explicativos** detalhados para cada configuração
+- **Exemplos práticos** de configuração mínima e avançada
+
+### 🧹 **Otimização e Limpeza**
+- **Remoção de arquivos obsoletos** (10+ scripts antigos removidos)
+- **Código consolidado** e estrutura mais limpa
+- **Dependências otimizadas** no ambiente virtual
+- **Performance melhorada** no processo de instalação
+
+### 🔧 **Melhorias Técnicas**
+- **Autor atualizado** para `netovaat` 
+- **Compatibilidade mantida** com todas as funcionalidades da v2.1.1
+- **Sistema de logs** aprimorado durante instalação
+- **Validações robustas** de sistema e dependências
 
 ## ✨ Principais Funcionalidades
 
@@ -55,20 +84,38 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 
 ## 🚀 **Instalação Rápida (Ubuntu/Debian)**
 
-### **Opção 1: Instalação Automatizada (Recomendada)**
+### **Instalação Automatizada com Script Unificado**
+
+A versão 2.2.0 introduz um **script de instalação único** que substitui todos os scripts anteriores e oferece um processo simplificado e robusto:
 
 ```bash
-# 1. Baixar e executar o script de instalação
-wget -O install.sh https://raw.githubusercontent.com/seu-usuario/bgp-monitor/main/install.sh
-chmod +x install.sh
+# 1. Baixar e executar o script de instalação unificado
+cd /opt
+sudo git clone https://github.com/netovaat/bgp-monitor.git
+cd bgp-monitor
+sudo chmod +x install.sh
 sudo ./install.sh
 
-# 2. Configurar suas variáveis
-sudo nano /opt/bgp-monitor/.env
+# 2. Configurar suas variáveis (use .env.example como referência)
+sudo cp .env.example .env
+sudo nano .env
 
 # 3. Iniciar o serviço
 sudo systemctl start bgp-monitor
+sudo systemctl status bgp-monitor
 ```
+
+### **Funcionalidades do Script de Instalação Unificado**
+
+O novo `install.sh` inclui:
+- ✅ **Validação completa** de sistema e dependências
+- ✅ **Instalação automática** de PostgreSQL e Redis
+- ✅ **Configuração de ambiente** Python virtual otimizado
+- ✅ **Migrações de banco** com Alembic
+- ✅ **Configuração de serviço** systemd
+- ✅ **Testes funcionais** automáticos
+- ✅ **Logs coloridos** e informativos
+- ✅ **Recuperação de erros** inteligente
 
 ### **Opção 2: Instalação Manual**
 
@@ -135,32 +182,48 @@ sudo -u bgpmonitor bash -c "
 
 ## ⚙️ **Configuração**
 
-### **Arquivo .env Principal**
+### **Configuração Completa com .env.example**
+
+A versão 2.2.0 inclui um arquivo `.env.example` **completamente documentado** com todas as variáveis de configuração disponíveis:
+
+```bash
+# Copiar e editar configurações
+sudo cp .env.example .env
+sudo nano .env
+```
+
+O arquivo `.env.example` inclui:
+
+- 🗄️ **Configurações de Banco de Dados** (PostgreSQL)
+- 🚀 **Cache e Performance** (Redis)
+- 🌐 **Servidor HTTP** (Host, porta, debug)
+- 📡 **Monitoramento BGP** (intervalos, rate limiting, timeouts)
+- 🔔 **Sistema de Alertas** (Telegram, severidades)
+- 📊 **Detecção de Anomalias** (sensibilidade, baseline)
+- 🧹 **Retenção de Dados** (limpeza automática)
+- 📝 **Sistema de Logs** (níveis, formatação)
+- 🌍 **API RIPE** (configurações específicas)
+
+### **Configuração Mínima Essencial**
+
+Para um funcionamento básico, configure apenas:
+
 ```bash
 # === BANCO DE DADOS ===
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=bgp_monitor
 DB_USER=bgp_monitor
-DB_PASSWORD=your_secure_password_here
+DB_PASSWORD=sua_senha_segura_aqui
 
-# === TELEGRAM BOT ===
-TELEGRAM_BOT_TOKEN=123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ_example_token
-TELEGRAM_CHAT_ID=-1001234567890
+# === TELEGRAM BOT (Opcional) ===
+TELEGRAM_BOT_TOKEN=seu_token_aqui
+TELEGRAM_CHAT_ID=seu_chat_id_aqui
 
 # === APLICAÇÃO ===
 HOST=0.0.0.0
 PORT=8000
 DEBUG=false
-
-# === BGP MONITORAMENTO ===
-COLLECTION_INTERVAL=900          # 15 minutos
-API_RATE_LIMIT_PER_ASN=45       # 45 segundos entre requests
-API_BATCH_SIZE=3                 # 3 ASNs por batch
-API_TIMEOUT=30
-
-# === DETECÇÃO DE ANOMALIAS ===
-ANOMALY_SENSITIVITY=2.0          # Z-score threshold
 MIN_HISTORICAL_DAYS=7            # Mínimo de dados históricos
 BASELINE_CALCULATION_DAYS=30     # Dias para baseline
 

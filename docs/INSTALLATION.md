@@ -1,6 +1,6 @@
-# 📦 Instalação do BGP Monitor v2.1.1
+# 📦 Instalação do BGP Monitor v2.2.0
 
-Guia completo de instalação do BGP Monitor v2.1.1 com arquitetura PostgreSQL.
+Guia completo de instalação do BGP Monitor v2.2.0 com **script de instalação unificado** e documentação de configuração completa.
 
 ## 📋 Pré-requisitos
 
@@ -16,39 +16,92 @@ Guia completo de instalação do BGP Monitor v2.1.1 com arquitetura PostgreSQL.
 - Acesso à internet para download de dependências
 - Permissões para criar usuários e banco de dados PostgreSQL
 
-## 🚀 Instalação Rápida
+## 🚀 Instalação com Script Unificado (Recomendado)
 
-### Método 1: Script Automático (Recomendado)
+### Novo Script de Instalação Único
+
+A versão 2.2.0 introduz um **script de instalação unificado** que substitui todos os scripts anteriores:
 
 ```bash
-# 1. Extrair o pacote
-tar -xzf bgp-monitor-v2.1.0.tar.gz
+# 1. Clonar ou extrair o projeto
+cd /opt
+sudo git clone https://github.com/netovaat/bgp-monitor.git
 cd bgp-monitor
 
-# 2. Executar instalação automática
-sudo chmod +x install-v2.1.sh
-sudo ./install-v2.1.sh
+# 2. Executar instalação unificada
+sudo chmod +x install.sh
+sudo ./install.sh
 
-# 3. Testar sistema
-sudo chmod +x test-system-v2.1.sh
-sudo ./test-system-v2.1.sh
+# 3. Configurar variáveis (use .env.example como referência)
+sudo cp .env.example .env
+sudo nano .env
+
+# 4. Iniciar serviço
+sudo systemctl start bgp-monitor
+sudo systemctl status bgp-monitor
 ```
 
-### Método 2: Com Correções Automáticas
+### Funcionalidades do Script Unificado
 
-Se encontrar problemas durante a instalação, use este método:
+O novo `install.sh` oferece:
+
+- ✅ **Validação completa** do sistema operacional e dependências
+- ✅ **Instalação automática** de PostgreSQL 15 e Redis
+- ✅ **Configuração de usuários** e bancos de dados
+- ✅ **Ambiente Python virtual** otimizado
+- ✅ **Migrações Alembic** automáticas
+- ✅ **Serviço systemd** configurado automaticamente
+- ✅ **Testes funcionais** automáticos
+- ✅ **Logs coloridos** durante todo o processo
+- ✅ **Recuperação de erros** inteligente
+- ✅ **Limpeza automática** em caso de falha
+
+## ⚙️ Configuração Completa com .env.example
+
+### Documentação de Configuração Detalhada
+
+A versão 2.2.0 inclui um arquivo `.env.example` **completamente documentado** com todas as variáveis de configuração:
 
 ```bash
-# 1. Extrair o pacote
-tar -xzf bgp-monitor-v2.0-final.tar.gz
-cd bgp-monitor
+# Copiar arquivo de exemplo
+sudo cp .env.example .env
 
-# 2. Aplicar correções conhecidas
-sudo chmod +x aplicar-correções.sh
-sudo ./aplicar-correções.sh
+# Editar configurações
+sudo nano .env
+```
 
-# 3. Executar instalação
-sudo chmod +x install.sh
+### Seções de Configuração Disponíveis
+
+O arquivo `.env.example` está organizado nas seguintes seções:
+
+- 🗄️ **Database Configuration** - PostgreSQL e conexões
+- 🚀 **Cache Configuration** - Redis e performance
+- 🌐 **HTTP Server Configuration** - Host, porta e debug
+- 📡 **BGP Monitoring Configuration** - Intervalos e rate limiting
+- 🔔 **Alert System Configuration** - Telegram e notificações
+- 📊 **Anomaly Detection Configuration** - Sensibilidade e thresholds
+- 🧹 **Data Retention Configuration** - Limpeza automática
+- 📝 **Logging Configuration** - Níveis e formatação
+- 🌍 **RIPE API Configuration** - Configurações específicas da API
+
+### Configuração Mínima Necessária
+
+Para funcionamento básico, configure pelo menos:
+
+```bash
+# Banco de dados
+DB_HOST=localhost
+DB_USER=bgp_monitor
+DB_PASSWORD=sua_senha_segura
+
+# Telegram (opcional)
+TELEGRAM_BOT_TOKEN=seu_token
+TELEGRAM_CHAT_ID=seu_chat_id
+
+# Aplicação
+HOST=0.0.0.0
+PORT=8000
+```
 sudo ./install.sh
 ```
 

@@ -1,0 +1,6 @@
+# Checksums MD5 dos arquivos principais
+052bf4be7b1b15f16e7a36b40297f0e4  install.sh
+88f97af1ad8f79f5bb8bd8f7fe57e9a5  .env.example
+5619c9d3f979ffce072a315803f19e2d  requirements.txt
+6092a7a2b7117f11598c9f1252ac6357  app/__init__.py
+532dd908d7616b628957fae9ada40fd9  README.md
