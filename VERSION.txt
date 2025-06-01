@@ -1,5 +1,5 @@
-BGP Monitor v1.0.0
+BGP Monitor v1.0.1
 Autor: netovaat
 GitHub: https://github.com/netovaat/bgp-monitor
-Data do Build: 2025-05-31 06:48:01
+Data do Build: 2025-05-31 21:50:00
 Sistema: Linux vmi2523851.contaboserver.net 5.15.0-25-generic #25-Ubuntu SMP Wed Mar 30 15:54:22 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux

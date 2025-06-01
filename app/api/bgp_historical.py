@@ -291,6 +291,42 @@ async def import_configuration(
     }
 
 
+@router.post("/collect/force")
+async def force_collection_all():
+    """Força coleta manual de dados para todos os ASNs ativos"""
+    enabled_asns = asn_config_manager.get_enabled_asns()
+    
+    if not enabled_asns:
+        raise HTTPException(status_code=404, detail="No ASNs enabled for monitoring")
+    
+    results = []
+    failed_asns = []
+    
+    for asn in enabled_asns:
+        try:
+            result = await bgp_data_service.collect_asn_snapshot(asn)
+            if result:
+                results.append({
+                    "asn": asn,
+                    "status": "success",
+                    "snapshot": result
+                })
+            else:
+                failed_asns.append(asn)
+        except Exception as e:
+            failed_asns.append(asn)
+            logger.error(f"Failed to collect data for AS{asn}: {str(e)}")
+    
+    return {
+        "message": f"Force collection completed for {len(results)} ASNs",
+        "total_asns": len(enabled_asns),
+        "successful": len(results),
+        "failed": len(failed_asns),
+        "failed_asns": failed_asns,
+        "results": results
+    }
+
+
 @router.post("/asns/{asn}/collect")
 async def manual_collection(asn: int):
     """Força coleta manual de dados para um ASN específico"""

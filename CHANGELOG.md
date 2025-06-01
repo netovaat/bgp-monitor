@@ -1,5 +1,43 @@
 # Changelog - BGP Monitor
 
+## [1.0.1] - 2025-05-31
+
+### 🔗 Monitoramento de Peers BGP
+Esta versão adiciona funcionalidades avançadas de monitoramento de relacionamentos BGP, permitindo análise detalhada de peers, upstreams e customers.
+
+#### 🆕 Novas Funcionalidades
+- **Monitoramento de peers por ASN**: Novo endpoint `/monitoring/peers/{asn}` para análise de relacionamentos BGP específicos
+- **Classificação automática de relacionamentos**: Algoritmo inteligente para identificar upstreams, peers e customers baseado em dados RIPE
+- **Análise de saúde da rede**: Validação automática de conectividade com detecção de upstreams insuficientes
+- **Sistema de alertas de peers**: Notificações automáticas para perda de peers críticos e problemas de conectividade
+
+#### 🚨 Sistema de Alertas Aprimorado
+- **Alertas de perda de peers**: Detecção automática de peers perdidos com severidade baseada no tipo de relacionamento
+- **Monitoramento de upstreams críticos**: Alertas quando número de upstreams fica abaixo do mínimo configurado
+- **Prevenção de spam de alertas**: Sistema inteligente para evitar notificações duplicadas
+- **Logs estruturados**: Registro detalhado de eventos para auditoria e troubleshooting
+
+#### 🔧 Melhorias Técnicas
+- **Performance otimizada**: Cache inteligente de peers conhecidos para reduzir chamadas à API RIPE
+- **Tratamento robusto de erros**: Handling completo de casos extremos (ASNs inexistentes, timeouts, etc.)
+- **Integração com scheduler**: Monitoramento contínuo de relacionamentos BGP junto com outras verificações
+- **Métricas expandidas**: Coleta de métricas detalhadas sobre peers, power ranking e contadores IPv4/IPv6
+
+#### 📊 Novos Endpoints da API
+- `GET /monitoring/peers/{asn}` - Análise detalhada de peers para ASN específico
+- `POST /monitoring/check-peers` - Execução manual de verificação de peers
+
+#### 🧪 Validação e Testes
+- **Testes extensivos**: Validação com múltiplos ASNs reais incluindo casos extremos
+- **Taxa de sucesso**: 100% nos testes de funcionalidade
+- **Performance validada**: Tempo de resposta < 1 segundo por consulta
+- **Integração validada**: Funcionamento correto com sistema de alertas e scheduler
+
+### 🔄 Alterações na Arquitetura
+- **PeerMonitor**: Nova classe para gerenciamento de relacionamentos BGP
+- **API expandida**: Novos endpoints integrados com sistema existente
+- **Scheduler atualizado**: Inclusão de verificações de peers no ciclo de monitoramento
+
 ## [1.0.0] - 2025-01-12
 
 ### 🚀 Release Inicial

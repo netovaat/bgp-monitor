@@ -431,6 +431,25 @@ async def get_as_peers(asn: int):
         )
 
 
+@app.get("/monitoring/peers/{asn}")
+async def check_asn_peers(asn: int):
+    """Verifica peers de um ASN específico"""
+    try:
+        logger.info(f"Checking peers for ASN {asn}")
+        
+        # Executar verificação de peers para ASN específico
+        result = await peer_monitor.check_specific_asn_peers(asn)
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"ASN peer check failed for {asn}: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro na verificação de peers do ASN {asn}: {str(e)}"
+        )
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host=settings.host, port=settings.port)

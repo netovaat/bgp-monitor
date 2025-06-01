@@ -1,7 +1,7 @@
 # 🎉 BGP Monitor v1.0.0 - Release Notes
 
-**Data de Release**: 12 de Janeiro de 2025  
-**Autor**: netovaat  
+**Data de Release**: 31 de Maio de 2025  
+**Autor**: Valdir Neto  
 **Tipo**: Release Inicial Estável
 
 ---

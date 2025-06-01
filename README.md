@@ -1,10 +1,10 @@
-# BGP Monitor v1.0.0
+# BGP Monitor v1.0.1
 
 🚀 **Sistema avançado de monitoramento BGP com PostgreSQL e detecção de anomalias estatísticas**
 
 Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos dados BGP, armazene histórico por 1 ano e receba alertas inteligentes. Sistema completo com rate limiting otimizado para não ser bloqueado pela API RIPE.
 
-**✅ Versão 1.0.0 - Release Inicial**
+**✅ Versão 1.0.1 - Funcionalidade de Monitoramento de Peers**
 
 ## 📚 **Documentação Completa**
 
@@ -14,6 +14,32 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 - [🌐 Referência da API](docs/API.md)
 - [🏗️ Arquitetura do Sistema](docs/ARCHITECTURE.md)
 - [🔍 Troubleshooting](docs/TROUBLESHOOTING.md)
+
+## 🆕 **Novidades da v1.0.1**
+
+### 🔗 **Monitoramento de Peers BGP**
+- **Análise de relacionamentos BGP** com classificação automática de upstreams, peers e customers
+- **Novo endpoint REST** `/monitoring/peers/{asn}` para consulta de peers específicos
+- **Detecção de upstreams insuficientes** com alertas automáticos de conectividade
+- **Integração com scheduler** para monitoramento contínuo de relacionamentos BGP
+
+### 📊 **Análise Avançada de Conectividade**
+- **Classificação inteligente** de relacionamentos baseada em dados RIPE
+- **Análise de saúde da rede** com validação de redundância
+- **Suporte a múltiplos ASNs** para análise comparativa
+- **Métricas de peers** incluindo power ranking e contadores IPv4/IPv6
+
+### 🚨 **Sistema de Alertas Aprimorado**
+- **Alertas de perda de peers** com severidade baseada no tipo de relacionamento
+- **Monitoramento de upstreams críticos** para detecção de problemas de conectividade
+- **Prevenção de spam** com controle de frequência de alertas
+- **Logs estruturados** para auditoria e troubleshooting
+
+### 🔧 **Melhorias Técnicas**
+- **Performance otimizada** com cache inteligente de peers conhecidos
+- **API REST expandida** com novos endpoints de monitoramento
+- **Tratamento robusto de erros** para casos extremos
+- **Documentação completa** com exemplos práticos
 
 ## 🆕 **Novidades da v1.0.0**
 

@@ -33,7 +33,7 @@ class PeerMonitor:
             # Se é a primeira execução, apenas armazena os peers atuais
             if not self.known_peers:
                 self.known_peers = {peer["asn"]: peer for peer in current_peers}
-                logger.info("Initial peer discovery", peer_count=len(current_peers))
+                logger.info(f"Initial peer discovery - peer_count: {len(current_peers)}")
                 return alerts
                 
             # Detecta peers perdidos
@@ -67,11 +67,11 @@ class PeerMonitor:
                     await telegram_service.send_alert(alert_data)
                     metrics.increment_alert_counter("peer_loss")
                     
-                    logger.warning("Peer loss detected", peer_asn=lost_asn, relationship=relationship)
+                    logger.warning(f"Peer loss detected - peer_asn: {lost_asn}, relationship: {relationship}")
             
             # Log para novos peers (informativo)
             for new_asn in new_peers:
-                logger.info("New peer discovered", peer_asn=new_asn)
+                logger.info(f"New peer discovered - peer_asn: {new_asn}")
             
             # Atualiza cache de peers conhecidos
             self.known_peers = {peer["asn"]: peer for peer in current_peers}
@@ -162,12 +162,49 @@ class PeerMonitor:
             
         return alerts
     
+    async def check_specific_asn_peers(self, asn: int) -> Dict[str, Any]:
+        """Verifica peers de um ASN específico"""
+        try:
+            # Obtém vizinhos do ASN específico
+            neighbours_data = await ripe_api.get_asn_neighbours(asn)
+            current_peers = self._extract_peer_info(neighbours_data)
+            
+            # Analisar tipos de relacionamento
+            relationships = {}
+            for peer in current_peers:
+                rel_type = peer.get("relationship_type", "unknown")
+                relationships[rel_type] = relationships.get(rel_type, 0) + 1
+            
+            # Verificar se tem upstreams suficientes
+            upstream_count = relationships.get("upstream", 0)
+            has_sufficient_upstreams = upstream_count >= self.min_upstreams
+            
+            return {
+                "asn": asn,
+                "timestamp": datetime.utcnow().isoformat(),
+                "total_peers": len(current_peers),
+                "peer_breakdown": relationships,
+                "has_sufficient_upstreams": has_sufficient_upstreams,
+                "min_upstreams_required": self.min_upstreams,
+                "peers": current_peers[:10],  # Limitando a 10 para não sobrecarregar
+                "status": "healthy" if has_sufficient_upstreams else "warning"
+            }
+            
+        except Exception as e:
+            logger.error(f"Error checking peers for ASN {asn}: {str(e)}")
+            return {
+                "asn": asn,
+                "timestamp": datetime.utcnow().isoformat(),
+                "error": str(e),
+                "status": "error"
+            }
+    
     def _extract_peer_info(self, neighbours_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Extrai informações de peers dos dados da API"""
         peers = []
         
-        data = neighbours_data.get("data", {})
-        neighbours = data.get("neighbours", [])
+        # A API RIPE retorna os dados diretamente, não aninhados em "data"
+        neighbours = neighbours_data.get("neighbours", [])
         
         for neighbour in neighbours:
             peer_asn = neighbour.get("asn")
@@ -178,7 +215,10 @@ class PeerMonitor:
                 peer_info = {
                     "asn": peer_asn,
                     "relationship_type": relationship_type,
-                    "description": neighbour.get("holder", ""),
+                    "type": neighbour.get("type", "unknown"),  # left/right do RIPE
+                    "power": neighbour.get("power", 0),
+                    "v4_peers": neighbour.get("v4_peers", 0),
+                    "v6_peers": neighbour.get("v6_peers", 0),
                     "last_seen": datetime.utcnow().isoformat()
                 }
                 peers.append(peer_info)
@@ -186,17 +226,28 @@ class PeerMonitor:
         return peers
     
     def _determine_relationship(self, neighbour: Dict[str, Any]) -> str:
-        """Determina tipo de relacionamento BGP (heurística simples)"""
-        # Implementação básica - em produção seria mais sofisticada
+        """Determina tipo de relacionamento BGP baseado nos dados do RIPE"""
         asn = neighbour.get("asn")
+        ripe_type = neighbour.get("type", "")
+        power = neighbour.get("power", 0)
         
-        # Heurística: ASNs menores geralmente são upstreams
-        if asn and asn < 10000:
-            return "upstream"
-        elif asn and asn > 60000:
+        # No RIPE: "left" = providers/upstreams, "right" = customers
+        if ripe_type == "left":
+            # Heurística adicional: ASNs menores e com mais poder geralmente são upstreams
+            if asn and (asn < 20000 or power > 200):
+                return "upstream"
+            else:
+                return "peer"
+        elif ripe_type == "right":
             return "customer"
         else:
-            return "peer"
+            # Fallback para heurística original
+            if asn and asn < 10000:
+                return "upstream"
+            elif asn and asn > 60000:
+                return "customer"
+            else:
+                return "peer"
     
     def _has_recent_alert(self, alert_type: str, identifier: str) -> bool:
         """Verifica se já existe alerta recente para evitar spam"""
