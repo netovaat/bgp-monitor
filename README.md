@@ -83,7 +83,7 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 │  🔄 Recovery Monitor       │  ✅ Alertas de Recuperação    │
 │  💾 Database Layer         │  🐘 PostgreSQL + Alembic      │
 │  🔌 RIPE API Client        │  🌍 Rate Limiting Inteligente │
-│  📱 Telegram Alerts        │  🇧🇷 Mensagens PT-BR + Emojis  │
+│  📱 Telegram Alerts        │  🇧🇷 Mensagens PT-BR + Emojis   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
