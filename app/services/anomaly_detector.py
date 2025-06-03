@@ -22,6 +22,8 @@ class BGPAnomalyDetector:
     
     def __init__(self):
         self.alert_cooldown = {}  # Cache para evitar spam de alertas
+        self.active_anomalies = {}  # Cache de anomalias ativas para detectar recuperação
+        self.active_instabilities = {}  # Cache de instabilidades ativas
     
     async def detect_sudden_changes(self, asn: int, sensitivity: str = "medium") -> List[Dict[str, Any]]:
         """
@@ -99,8 +101,21 @@ class BGPAnomalyDetector:
                         "description": f"Detected {anomaly_type} in AS{asn}: {current_count} prefixes ({percent_change:.1f}% change)"
                     }
                     
+                    # Registrar anomalia ativa
+                    self.active_anomalies[asn] = {
+                        "type": anomaly_type,
+                        "detected_at": snapshot.timestamp,
+                        "severity": anomaly["severity"],
+                        "z_score": z_score,
+                        "percent_change": percent_change
+                    }
+                    
                     anomalies.append(anomaly)
-            
+                else:
+                    # Não há anomalia - verificar se havia uma ativa e foi resolvida
+                    if asn in self.active_anomalies:
+                        await self._check_anomaly_recovery(asn, current_count, baseline_mean, snapshot.timestamp)
+    
             return anomalies
     
     async def detect_routing_instability(self, asn: int, window_hours: int = 6) -> Dict[str, Any]:
@@ -200,8 +215,17 @@ class BGPAnomalyDetector:
                 instability = await self.detect_routing_instability(asn, 6)
                 if instability.get("status") in ["unstable", "highly_unstable"]:
                     results["instability_reports"].append(instability)
-                    if instability.get("status") == "highly_unstable":
-                        results["summary"]["unstable_asns"] += 1
+                    results["summary"]["unstable_asns"] += 1
+                    
+                    # Registrar instabilidade ativa
+                    self.active_instabilities[asn] = {
+                        "status": instability["status"],
+                        "score": instability["instability_score"],
+                        "detected_at": datetime.now()
+                    }
+                else:
+                    # Verificar se havia instabilidade e foi resolvida
+                    await self._check_instability_recovery(asn, instability)
                 
                 # Delay pequeno entre processamentos
                 await asyncio.sleep(0.1)
@@ -287,7 +311,87 @@ class BGPAnomalyDetector:
             "highly_unstable": "URGENT: Significant routing instability detected. Immediate investigation required."
         }
         return recommendations.get(status, "Unknown status")
-
+    
+    async def _check_anomaly_recovery(self, asn: int, current_count: int, baseline_mean: float, timestamp: datetime):
+        """Verifica se uma anomalia foi resolvida e envia alerta de recuperação"""
+        if asn not in self.active_anomalies:
+            return
+            
+        active_anomaly = self.active_anomalies[asn]
+        
+        # Calcular tempo de duração da anomalia
+        problem_duration = timestamp - active_anomaly["detected_at"]
+        downtime_minutes = int(problem_duration.total_seconds() / 60)
+        
+        # Dados para alerta de recuperação
+        recovery_data = {
+            "alert_type": "anomaly_resolved",
+            "severity": "info",
+            "title": f"Anomalia resolvida para AS{asn}",
+            "message": f"🟢 Anomalia estatística resolvida para AS{asn}.",
+            "details": {
+                "asn": asn,
+                "metric": "announcement_count",
+                "current_value": current_count,
+                "baseline_value": round(baseline_mean, 0),
+                "previous_anomaly_type": active_anomaly["type"],
+                "detection_method": "statistical_analysis",
+                "downtime_minutes": downtime_minutes,
+                "recovery_time": timestamp.isoformat()
+            }
+        }
+        
+        # Enviar alerta de recuperação
+        await telegram_service.send_recovery_alert(recovery_data)
+        
+        # Remover da cache de anomalias ativas
+        del self.active_anomalies[asn]
+        
+        logger.info(f"Anomaly recovery detected for AS{asn}: {active_anomaly['type']} resolved after {downtime_minutes} minutes")
+    
+    async def _check_instability_recovery(self, asn: int, instability_report: Dict[str, Any]):
+        """Verifica se instabilidade foi resolvida"""
+        if asn not in self.active_instabilities:
+            return
+            
+        current_status = instability_report.get("status", "stable")
+        
+        # Se o status atual é estável, a instabilidade foi resolvida
+        if current_status in ["stable", "moderately_stable"]:
+            active_instability = self.active_instabilities[asn]
+            
+            # Calcular tempo de duração da instabilidade
+            from datetime import datetime
+            current_time = datetime.now()
+            problem_duration = current_time - active_instability["detected_at"]
+            downtime_minutes = int(problem_duration.total_seconds() / 60)
+            
+            # Dados para alerta de recuperação
+            recovery_data = {
+                "alert_type": "instability_resolved",
+                "severity": "info",
+                "title": f"Instabilidade resolvida para AS{asn}",
+                "message": f"🟢 Instabilidade de roteamento resolvida para AS{asn}.",
+                "details": {
+                    "asn": asn,
+                    "previous_status": active_instability["status"],
+                    "current_status": current_status,
+                    "stable_time_minutes": 30,  # Tempo considerado estável
+                    "previous_instability_score": active_instability["score"],
+                    "current_instability_score": instability_report.get("instability_score", 0),
+                    "downtime_minutes": downtime_minutes,
+                    "recovery_time": current_time.isoformat()
+                }
+            }
+            
+            # Enviar alerta de recuperação
+            await telegram_service.send_recovery_alert(recovery_data)
+            
+            # Remover da cache de instabilidades ativas
+            del self.active_instabilities[asn]
+            
+            logger.info(f"Instability recovery detected for AS{asn}: {active_instability['status']} -> {current_status} after {downtime_minutes} minutes")
+    
 
 # Instância global do detector
 anomaly_detector = BGPAnomalyDetector()

@@ -93,6 +93,28 @@ class PrefixMonitor:
                         
                         logger.warning(f"Missing prefix detected: {prefix} (ASN: {self.target_asn})")
                 else:
+                    # Verifica se o prefixo estava ausente e agora foi restaurado
+                    if self._had_recent_alert("prefix_missing", prefix):
+                        # Calcula tempo de ausência
+                        downtime_minutes = self._calculate_downtime("prefix_missing", prefix)
+                        
+                        recovery_data = {
+                            "alert_type": "prefix_restored",
+                            "severity": "info",
+                            "title": f"Prefixo {prefix} restaurado",
+                            "message": f"🟢 Prefixo {prefix} restaurado na tabela BGP.",
+                            "details": {
+                                "prefix": prefix,
+                                "asn": self.target_asn,
+                                "downtime_minutes": downtime_minutes,
+                                "check_time": datetime.utcnow().isoformat()
+                            }
+                        }
+                        
+                        # Envia notificação de recuperação
+                        await telegram_service.send_recovery_alert(recovery_data)
+                        logger.info(f"Prefix recovery detected: {prefix} (ASN: {self.target_asn}), downtime: {downtime_minutes}min")
+                    
                     # Prefixo está sendo anunciado - limpa alertas
                     self._clear_alert("prefix_missing", prefix)
                     logger.debug(f"Prefix announcement confirmed: {prefix}")
@@ -129,6 +151,24 @@ class PrefixMonitor:
         """Remove registro de alerta quando problema é resolvido"""
         key = f"{alert_type}:{identifier}"
         self.last_alerts.pop(key, None)
+    
+    def _had_recent_alert(self, alert_type: str, identifier: str) -> bool:
+        """Verifica se um alerta existia recentemente (para detecção de recuperação)"""
+        key = f"{alert_type}:{identifier}"
+        return key in self.last_alerts
+    
+    def _calculate_downtime(self, alert_type: str, identifier: str) -> int:
+        """Calcula tempo de indisponibilidade em minutos desde o alerta original"""
+        key = f"{alert_type}:{identifier}"
+        last_alert = self.last_alerts.get(key)
+        
+        if last_alert:
+            alert_time = datetime.fromisoformat(last_alert)
+            current_time = datetime.utcnow()
+            time_diff = current_time - alert_time
+            return int(time_diff.total_seconds() / 60)
+        
+        return 0
 
 
 # Instância global do monitor

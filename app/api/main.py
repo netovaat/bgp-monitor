@@ -450,6 +450,507 @@ async def check_asn_peers(asn: int):
         )
 
 
+# Endpoints de Testes de Alarmes de Recuperação
+@app.post("/test/recovery/peer")
+async def test_peer_recovery_alert():
+    """Testa alerta de recuperação de peer"""
+    try:
+        alert_data = {
+            "alert_type": "peer_recovered",
+            "timestamp": datetime.utcnow().isoformat(),
+            "severity": "info",
+            "target_asn": settings.target_asn,
+            "details": {
+                "peer_asn": 64512,
+                "peer_name": "AS64512 - Provedor Exemplo",
+                "downtime_minutes": 47,
+                "recovery_time": datetime.utcnow().isoformat()
+            }
+        }
+        
+        await telegram_service.send_recovery_alert(alert_data)
+        
+        logger.info("Sent test peer recovery alert")
+        
+        return {
+            "status": "success",
+            "message": "Alerta de recuperação de peer enviado com sucesso",
+            "alert_data": alert_data
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to send test peer recovery alert: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao enviar alerta de teste: {str(e)}"
+        )
+
+
+@app.post("/test/recovery/upstreams")
+async def test_upstreams_normalized_alert():
+    """Testa alerta de normalização de upstreams"""
+    try:
+        alert_data = {
+            "alert_type": "upstreams_normalized",
+            "timestamp": datetime.utcnow().isoformat(),
+            "severity": "info",
+            "target_asn": settings.target_asn,
+            "details": {
+                "current_upstreams": 4,
+                "required_minimum": 3,
+                "downtime_minutes": 23,
+                "recovery_time": datetime.utcnow().isoformat()
+            }
+        }
+        
+        await telegram_service.send_recovery_alert(alert_data)
+        
+        logger.info("Sent test upstreams normalized alert")
+        
+        return {
+            "status": "success",
+            "message": "Alerta de normalização de upstreams enviado com sucesso",
+            "alert_data": alert_data
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to send test upstreams normalized alert: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao enviar alerta de teste: {str(e)}"
+        )
+
+
+@app.post("/test/recovery/prefix")
+async def test_prefix_restored_alert():
+    """Testa alerta de restauração de prefixo"""
+    try:
+        alert_data = {
+            "alert_type": "prefix_restored",
+            "timestamp": datetime.utcnow().isoformat(),
+            "severity": "info",
+            "target_asn": settings.target_asn,
+            "details": {
+                "prefix": "203.0.113.0/24",
+                "origin_asn": settings.target_asn,
+                "downtime_minutes": 15,
+                "recovery_time": datetime.utcnow().isoformat(),
+                "current_paths": 3
+            }
+        }
+        
+        await telegram_service.send_recovery_alert(alert_data)
+        
+        logger.info("Sent test prefix restored alert")
+        
+        return {
+            "status": "success",
+            "message": "Alerta de restauração de prefixo enviado com sucesso",
+            "alert_data": alert_data
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to send test prefix restored alert: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao enviar alerte de teste: {str(e)}"
+        )
+
+
+@app.post("/test/recovery/latency")
+async def test_latency_normalized_alert():
+    """Testa alerta de normalização de latência"""
+    try:
+        alert_data = {
+            "alert_type": "latency_normalized",
+            "timestamp": datetime.utcnow().isoformat(),
+            "severity": "info",
+            "target_asn": settings.target_asn,
+            "details": {
+                "peer_asn": 64512,
+                "peer_name": "AS64512 - Provedor Exemplo",
+                "current_latency": 45,
+                "max_latency": settings.max_latency_ms,
+                "previous_latency": 850,
+                "downtime_minutes": 8
+            }
+        }
+        
+        await telegram_service.send_recovery_alert(alert_data)
+        
+        logger.info("Sent test latency normalized alert")
+        
+        return {
+            "status": "success",
+            "message": "Alerta de normalização de latência enviado com sucesso",
+            "alert_data": alert_data
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to send test latency normalized alert: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao enviar alerta de teste: {str(e)}"
+        )
+
+
+@app.post("/test/recovery/instability")
+async def test_instability_resolved_alert():
+    """Testa alerta de resolução de instabilidade"""
+    try:
+        alert_data = {
+            "alert_type": "instability_resolved",
+            "timestamp": datetime.utcnow().isoformat(),
+            "severity": "info",
+            "target_asn": settings.target_asn,
+            "details": {
+                "prefix": "203.0.113.0/24",
+                "origin_asn": settings.target_asn,
+                "stable_time_minutes": 30,
+                "previous_flaps": 23,
+                "downtime_minutes": 62
+            }
+        }
+        
+        await telegram_service.send_recovery_alert(alert_data)
+        
+        logger.info("Sent test instability resolved alert")
+        
+        return {
+            "status": "success",
+            "message": "Alerta de resolução de instabilidade enviado com sucesso",
+            "alert_data": alert_data
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to send test instability resolved alert: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao enviar alerta de teste: {str(e)}"
+        )
+
+
+@app.post("/test/recovery/anomaly")
+async def test_anomaly_resolved_alert():
+    """Testa alerta de resolução de anomalia"""
+    try:
+        alert_data = {
+            "alert_type": "anomaly_resolved",
+            "timestamp": datetime.utcnow().isoformat(),
+            "severity": "info",
+            "target_asn": settings.target_asn,
+            "details": {
+                "metric": "announcement_count",
+                "current_value": 1250,
+                "baseline_value": 1200,
+                "anomaly_type": "spike",
+                "detection_method": "statistical_analysis",
+                "downtime_minutes": 18
+            }
+        }
+        
+        await telegram_service.send_recovery_alert(alert_data)
+        
+        logger.info("Sent test anomaly resolved alert")
+        
+        return {
+            "status": "success",
+            "message": "Alerta de resolução de anomalia enviado com sucesso",
+            "alert_data": alert_data
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to send test anomaly resolved alert: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao enviar alerta de teste: {str(e)}"
+        )
+
+
+@app.post("/test/recovery/all")
+async def test_all_recovery_alerts():
+    """Testa todos os tipos de alertas de recuperação"""
+    try:
+        results = []
+        
+        # Lista de todos os tipos de alertas de recuperação
+        recovery_alerts = [
+            {
+                "type": "peer_recovered",
+                "data": {
+                    "alert_type": "peer_recovered",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "severity": "info",
+                    "target_asn": settings.target_asn,
+                    "details": {
+                        "peer_asn": 64512,
+                        "peer_name": "AS64512 - Provedor Exemplo",
+                        "downtime_minutes": 47,
+                        "recovery_time": datetime.utcnow().isoformat()
+                    }
+                }
+            },
+            {
+                "type": "upstreams_normalized",
+                "data": {
+                    "alert_type": "upstreams_normalized",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "severity": "info",
+                    "target_asn": settings.target_asn,
+                    "details": {
+                        "current_upstreams": 4,
+                        "required_minimum": 3,
+                        "downtime_minutes": 23,
+                        "recovery_time": datetime.utcnow().isoformat()
+                    }
+                }
+            },
+            {
+                "type": "prefix_restored",
+                "data": {
+                    "alert_type": "prefix_restored",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "severity": "info",
+                    "target_asn": settings.target_asn,
+                    "details": {
+                        "prefix": "203.0.113.0/24",
+                        "origin_asn": settings.target_asn,
+                        "downtime_minutes": 15,
+                        "recovery_time": datetime.utcnow().isoformat(),
+                        "current_paths": 3
+                    }
+                }
+            },
+            {
+                "type": "latency_normalized",
+                "data": {
+                    "alert_type": "latency_normalized",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "severity": "info",
+                    "target_asn": settings.target_asn,
+                    "details": {
+                        "peer_asn": 64512,
+                        "peer_name": "AS64512 - Provedor Exemplo",
+                        "current_latency": 45,
+                        "max_latency": settings.max_latency_ms,
+                        "previous_latency": 850,
+                        "downtime_minutes": 8
+                    }
+                }
+            },
+            {
+                "type": "instability_resolved",
+                "data": {
+                    "alert_type": "instability_resolved",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "severity": "info",
+                    "target_asn": settings.target_asn,
+                    "details": {
+                        "prefix": "203.0.113.0/24",
+                        "origin_asn": settings.target_asn,
+                        "stable_time_minutes": 30,
+                        "previous_flaps": 23,
+                        "downtime_minutes": 62
+                    }
+                }
+            },
+            {
+                "type": "anomaly_resolved",
+                "data": {
+                    "alert_type": "anomaly_resolved",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "severity": "info",
+                    "target_asn": settings.target_asn,
+                    "details": {
+                        "metric": "announcement_count",
+                        "current_value": 1250,
+                        "baseline_value": 1200,
+                        "anomaly_type": "spike",
+                        "detection_method": "statistical_analysis",
+                        "downtime_minutes": 18
+                    }
+                }
+            }
+        ]
+        
+        # Enviar cada tipo de alerta com um pequeno delay
+        for alert in recovery_alerts:
+            try:
+                await telegram_service.send_recovery_alert(alert["data"])
+                results.append({
+                    "type": alert["type"],
+                    "status": "success",
+                    "message": f"Alerta {alert['type']} enviado com sucesso"
+                })
+                
+                # Pequeno delay entre alertas para não sobrecarregar
+                await asyncio.sleep(1)
+                
+            except Exception as e:
+                results.append({
+                    "type": alert["type"],
+                    "status": "error",
+                    "message": str(e)
+                })
+        
+        logger.info(f"Sent {len(recovery_alerts)} test recovery alerts")
+        
+        return {
+            "status": "completed",
+            "message": f"Teste de {len(recovery_alerts)} tipos de alertas de recuperação concluído",
+            "results": results,
+            "total_alerts": len(recovery_alerts),
+            "successful": len([r for r in results if r["status"] == "success"]),
+            "failed": len([r for r in results if r["status"] == "error"])
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to send test recovery alerts: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao enviar alertas de teste: {str(e)}"
+        )
+
+
+# Endpoints informativos sobre alertas
+@app.get("/alerts/types")
+async def get_alert_types():
+    """Lista todos os tipos de alertas disponíveis"""
+    return {
+        "problem_alerts": {
+            "peer_lost": {
+                "description": "Peer BGP perdido/desconectado",
+                "severity": "critical",
+                "emoji": "🔴",
+                "category": "connectivity"
+            },
+            "insufficient_upstreams": {
+                "description": "Número insuficiente de upstreams",
+                "severity": "critical", 
+                "emoji": "⚠️",
+                "category": "connectivity"
+            },
+            "prefix_missing": {
+                "description": "Prefixo não encontrado no BGP",
+                "severity": "critical",
+                "emoji": "🚨",
+                "category": "routing"
+            },
+            "high_latency": {
+                "description": "Latência elevada detectada",
+                "severity": "warning",
+                "emoji": "🐌",
+                "category": "performance"
+            },
+            "route_instability": {
+                "description": "Instabilidade de rota (flapping)",
+                "severity": "warning",
+                "emoji": "📊",
+                "category": "routing"
+            },
+            "anomaly_detected": {
+                "description": "Anomalia estatística detectada",
+                "severity": "warning",
+                "emoji": "📈",
+                "category": "analysis"
+            }
+        },
+        "recovery_alerts": {
+            "peer_recovered": {
+                "description": "Peer BGP recuperado/reconectado",
+                "severity": "info",
+                "emoji": "🟢",
+                "category": "connectivity"
+            },
+            "upstreams_normalized": {
+                "description": "Número de upstreams normalizado",
+                "severity": "info",
+                "emoji": "✅",
+                "category": "connectivity"
+            },
+            "prefix_restored": {
+                "description": "Prefixo restaurado no BGP",
+                "severity": "info",
+                "emoji": "🔄",
+                "category": "routing"
+            },
+            "latency_normalized": {
+                "description": "Latência normalizada",
+                "severity": "info",
+                "emoji": "⚡",
+                "category": "performance"
+            },
+            "instability_resolved": {
+                "description": "Instabilidade de rota resolvida",
+                "severity": "info",
+                "emoji": "📊",
+                "category": "routing"
+            },
+            "anomaly_resolved": {
+                "description": "Anomalia estatística resolvida",
+                "severity": "info",
+                "emoji": "📉",
+                "category": "analysis"
+            }
+        },
+        "system_alerts": {
+            "system_startup": {
+                "description": "Sistema iniciado",
+                "severity": "info",
+                "emoji": "🚀",
+                "category": "system"
+            },
+            "monitoring_error": {
+                "description": "Erro no monitoramento",
+                "severity": "error",
+                "emoji": "❌",
+                "category": "system"
+            }
+        }
+    }
+
+
+@app.get("/alerts/recovery/examples")
+async def get_recovery_alert_examples():
+    """Retorna exemplos de alertas de recuperação em PT-BR"""
+    return {
+        "description": "Exemplos de mensagens de alertas de recuperação em português brasileiro",
+        "language": "pt-br",
+        "examples": {
+            "peer_recovered": {
+                "title": "🟢 Peer BGP Recuperado",
+                "message": "O peer AS64512 - Provedor Exemplo foi reconectado após 47 minutos offline. Conectividade BGP restaurada.",
+                "details": ["Tempo de inatividade: 47 minutos", "Reconectado às 14:30 BRT"]
+            },
+            "upstreams_normalized": {
+                "title": "✅ Upstreams Normalizados", 
+                "message": "Número de upstreams normalizado (4/3 mínimo). Redundância BGP restaurada após 23 minutos.",
+                "details": ["Upstreams atuais: 4", "Mínimo necessário: 3", "Tempo de problema: 23 minutos"]
+            },
+            "prefix_restored": {
+                "title": "🔄 Prefixo Restaurado",
+                "message": "Prefixo 203.0.113.0/24 foi restaurado no BGP após 15 minutos ausente. Agora visível em 3 caminhos.",
+                "details": ["Caminhos atuais: 3", "Tempo de ausência: 15 minutos"]
+            },
+            "latency_normalized": {
+                "title": "⚡ Latência Normalizada",
+                "message": "Latência com AS64512 normalizada (45ms). Problema de performance resolvido após 8 minutos.",
+                "details": ["Latência atual: 45ms", "Latência anterior: 850ms", "Tempo de problema: 8 minutos"]
+            },
+            "instability_resolved": {
+                "title": "📊 Instabilidade Resolvida",
+                "message": "Instabilidade do prefixo 203.0.113.0/24 resolvida. Rota estável há 30 minutos após 23 oscilações.",
+                "details": ["Estável há: 30 minutos", "Oscilações anteriores: 23", "Tempo de problema: 62 minutos"]
+            },
+            "anomaly_resolved": {
+                "title": "📉 Anomalia Resolvida",
+                "message": "Anomalia estatística em 'announcement_count' resolvida. Valores normalizados após 18 minutos.",
+                "details": ["Valor atual: 1250", "Valor baseline: 1200", "Tempo de anomalia: 18 minutos"]
+            }
+        }
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host=settings.host, port=settings.port)

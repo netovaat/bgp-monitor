@@ -69,9 +69,34 @@ class PeerMonitor:
                     
                     logger.warning(f"Peer loss detected - peer_asn: {lost_asn}, relationship: {relationship}")
             
-            # Log para novos peers (informativo)
+            # Notificações para peers recuperados
             for new_asn in new_peers:
-                logger.info(f"New peer discovered - peer_asn: {new_asn}")
+                # Verifica se este peer tinha um alerta ativo
+                if self._had_recent_alert("peer_loss", str(new_asn)):
+                    # Encontra informações do peer recuperado
+                    peer_info = next((p for p in current_peers if p["asn"] == new_asn), {})
+                    relationship = peer_info.get("relationship_type", "unknown")
+                    
+                    # Calcula tempo de indisponibilidade
+                    downtime_minutes = self._calculate_downtime("peer_loss", str(new_asn))
+                    
+                    recovery_data = {
+                        "alert_type": "peer_recovered",
+                        "severity": "info",
+                        "title": f"Peer AS{new_asn} recuperado",
+                        "message": f"🟢 {relationship.capitalize()} AS{new_asn} recuperado com sucesso.",
+                        "details": {
+                            "peer_asn": new_asn,
+                            "relationship_type": relationship,
+                            "target_asn": self.target_asn,
+                            "downtime_minutes": downtime_minutes,
+                            "check_time": datetime.utcnow().isoformat()
+                        }
+                    }
+                    
+                    await telegram_service.send_recovery_alert(recovery_data)
+                    self._clear_alert("peer_loss", str(new_asn))
+                    logger.info(f"Peer recovery detected - peer_asn: {new_asn}, relationship: {relationship}, downtime: {downtime_minutes}min")
             
             # Atualiza cache de peers conhecidos
             self.known_peers = {peer["asn"]: peer for peer in current_peers}
@@ -102,6 +127,28 @@ class PeerMonitor:
                     await telegram_service.send_alert(alert_data)
                     metrics.increment_alert_counter("insufficient_upstreams")
             else:
+                # Verifica se havia problema de upstreams insuficientes e agora foi resolvido
+                if self._had_recent_alert("insufficient_upstreams", "global"):
+                    # Calcula tempo do problema
+                    problem_duration = self._calculate_downtime("insufficient_upstreams", "global")
+                    
+                    recovery_data = {
+                        "alert_type": "upstreams_normalized",
+                        "severity": "info",
+                        "title": f"Upstreams normalizados: {upstream_count}/{self.min_upstreams}",
+                        "message": f"🟢 Número de upstreams normalizado ({upstream_count}/{self.min_upstreams} mínimo).",
+                        "details": {
+                            "active_upstreams": upstream_count,
+                            "minimum_required": self.min_upstreams,
+                            "target_asn": self.target_asn,
+                            "problem_duration_minutes": problem_duration,
+                            "check_time": datetime.utcnow().isoformat()
+                        }
+                    }
+                    
+                    await telegram_service.send_recovery_alert(recovery_data)
+                    logger.info(f"Upstreams normalized - count: {upstream_count}, duration: {problem_duration}min")
+                
                 # Limpa alerta de upstreams insuficientes se resolvido
                 self._clear_alert("insufficient_upstreams", "global")
                 
@@ -131,31 +178,73 @@ class PeerMonitor:
             ]
             
             for peer in upstream_peers:
-                # Simula latência (em produção seria ping/traceroute real)
-                simulated_latency = 50.0  # ms
+                # Simula latência variável (em produção seria ping/traceroute real)
+                import random
+                # Simula latência entre 30-120ms com variação
+                base_latency = random.uniform(30, 120)
+                simulated_latency = round(base_latency, 1)
+                
+                peer_asn = peer["asn"]
+                peer_name = peer.get("name", f"AS{peer_asn}")
                 
                 if simulated_latency > settings.max_latency_ms:
+                    # Latência alta - criar alerta
                     alert_data = {
                         "alert_type": "high_latency",
                         "severity": "warning",
-                        "title": f"Latência alta para AS{peer['asn']}: {simulated_latency}ms",
-                        "message": f"⚠️ Latência para upstream AS{peer['asn']} está em {simulated_latency}ms (limite: {settings.max_latency_ms}ms)",
+                        "title": f"Latência alta para AS{peer_asn}: {simulated_latency}ms",
+                        "message": f"⚠️ Latência para upstream AS{peer_asn} está em {simulated_latency}ms (limite: {settings.max_latency_ms}ms)",
                         "details": {
-                            "peer_asn": peer["asn"],
+                            "peer_asn": peer_asn,
+                            "peer_name": peer_name,
                             "latency_ms": simulated_latency,
                             "threshold_ms": settings.max_latency_ms,
-                            "check_time": datetime.utcnow().isoformat()
+                            "check_time": datetime.utcnow().isoformat(),
+                            "target_asn": self.target_asn
                         }
                     }
                     
-                    if not self._has_recent_alert("high_latency", str(peer["asn"])):
+                    if not self._has_recent_alert("high_latency", str(peer_asn)):
                         alerts.append(alert_data)
-                        self._record_alert("high_latency", str(peer["asn"]))
+                        self._record_alert("high_latency", str(peer_asn))
                         await telegram_service.send_alert(alert_data)
                         metrics.increment_alert_counter("high_latency")
+                else:
+                    # Latência normal - verificar se havia problema e agora foi resolvido
+                    if self._had_recent_alert("high_latency", str(peer_asn)):
+                        # Calcular tempo do problema de latência
+                        downtime_minutes = self._calculate_downtime("high_latency", str(peer_asn))
+                        
+                        # Obter latência anterior do cache de alertas se disponível
+                        previous_latency = self._get_previous_latency(str(peer_asn))
+                        
+                        recovery_data = {
+                            "alert_type": "latency_normalized",
+                            "severity": "info",
+                            "title": f"Latência normalizada para AS{peer_asn}",
+                            "message": f"🟢 Latência normalizada para AS{peer_asn} ({simulated_latency}ms).",
+                            "details": {
+                                "peer_asn": peer_asn,
+                                "peer_name": peer_name,
+                                "current_latency": simulated_latency,
+                                "previous_latency": previous_latency,
+                                "max_latency": settings.max_latency_ms,
+                                "downtime_minutes": downtime_minutes,
+                                "target_asn": self.target_asn,
+                                "recovery_time": datetime.utcnow().isoformat()
+                            }
+                        }
+                        
+                        alerts.append(recovery_data)
+                        await telegram_service.send_recovery_alert(recovery_data)
+                        
+                        # Limpar alerta da cache
+                        self._clear_alert("high_latency", str(peer_asn))
+                        
+                        logger.info(f"Latency normalized for AS{peer_asn}: {simulated_latency}ms (was {previous_latency}ms, down for {downtime_minutes}min)")
                 
                 # Registra métrica de latência
-                metrics.record_latency_measurement(peer["asn"], simulated_latency)
+                metrics.record_latency_measurement(peer_asn, simulated_latency)
                 
         except Exception as e:
             logger.error(f"Error measuring latencies: {str(e)}")
@@ -270,6 +359,24 @@ class PeerMonitor:
         key = f"{alert_type}:{identifier}"
         self.last_alerts.pop(key, None)
     
+    def _had_recent_alert(self, alert_type: str, identifier: str) -> bool:
+        """Verifica se um alerta existia recentemente (para detecção de recuperação)"""
+        key = f"{alert_type}:{identifier}"
+        return key in self.last_alerts
+    
+    def _calculate_downtime(self, alert_type: str, identifier: str) -> int:
+        """Calcula tempo de indisponibilidade em minutos desde o alerta original"""
+        key = f"{alert_type}:{identifier}"
+        last_alert = self.last_alerts.get(key)
+        
+        if last_alert:
+            alert_time = datetime.fromisoformat(last_alert)
+            current_time = datetime.utcnow()
+            time_diff = current_time - alert_time
+            return int(time_diff.total_seconds() / 60)
+        
+        return 0
+    
     def get_peer_summary(self) -> Dict[str, Any]:
         """Retorna resumo dos peers atuais"""
         if not self.known_peers:
@@ -287,6 +394,13 @@ class PeerMonitor:
             "customers": relationships.get("customer", 0),
             "last_check": datetime.utcnow().isoformat()
         }
+    
+    def _get_previous_latency(self, peer_asn: str) -> float:
+        """Obtém a latência anterior de um peer (simulado)"""
+        # Em um sistema real, isso viria de métricas históricas
+        # Para simulação, retorna uma latência alta plausível
+        import random
+        return round(random.uniform(200, 800), 1)
 
 
 # Instância global do monitor

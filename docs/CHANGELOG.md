@@ -1,42 +1,70 @@
 # Changelog - BGP Monitor
 
-## [1.0.1] - 2025-05-31
+## [1.2.0] - 2025-06-01
 
-### 🔗 Monitoramento de Peers BGP
-Esta versão adiciona funcionalidades avançadas de monitoramento de relacionamentos BGP, permitindo análise detalhada de peers, upstreams e customers.
+### 🟢 Sistema de Alarmes de Recuperação
+- **NOVO**: Sistema completo de notificações de recuperação em português brasileiro
+- **6 tipos de recuperação**: peer_recovered, upstreams_normalized, prefix_restored, latency_normalized, instability_resolved, anomaly_resolved
+- **Detecção automática**: Identificação em tempo real quando problemas são resolvidos
+- **Cálculo de downtime**: Tempo automático de inatividade/problema calculado para cada recuperação
 
-#### 🆕 Novas Funcionalidades
-- **Monitoramento de peers por ASN**: Novo endpoint `/monitoring/peers/{asn}` para análise de relacionamentos BGP específicos
-- **Classificação automática de relacionamentos**: Algoritmo inteligente para identificar upstreams, peers e customers baseado em dados RIPE
-- **Análise de saúde da rede**: Validação automática de conectividade com detecção de upstreams insuficientes
-- **Sistema de alertas de peers**: Notificações automáticas para perda de peers críticos e problemas de conectividade
+### 📱 Aprimoramentos do Telegram
+- **Templates PT-BR**: Mensagens profissionais em português brasileiro para todos os tipos
+- **Emojis específicos**: 🟢, ✅, 🔄, ⚡, 📊, 📉 para diferentes tipos de recuperação  
+- **Formatação BRT**: Horários automaticamente formatados para fuso brasileiro
+- **Método send_recovery_alert()**: Nova função dedicada para alertas de recuperação
 
-#### 🚨 Sistema de Alertas Aprimorado
-- **Alertas de perda de peers**: Detecção automática de peers perdidos com severidade baseada no tipo de relacionamento
-- **Monitoramento de upstreams críticos**: Alertas quando número de upstreams fica abaixo do mínimo configurado
-- **Prevenção de spam de alertas**: Sistema inteligente para evitar notificações duplicadas
-- **Logs estruturados**: Registro detalhado de eventos para auditoria e troubleshooting
+### 🔧 Serviços Aprimorados
+- **Peer Monitor**: Detecção de recuperação de peers perdidos e normalização de latência
+- **Prefix Monitor**: Detecção de restauração de prefixos ausentes
+- **Anomaly Detector**: Detecção de resolução de anomalias estatísticas e instabilidades
+- **Cache inteligente**: Sistema de cache para detectar transições problema → recuperação
 
-#### 🔧 Melhorias Técnicas
-- **Performance otimizada**: Cache inteligente de peers conhecidos para reduzir chamadas à API RIPE
-- **Tratamento robusto de erros**: Handling completo de casos extremos (ASNs inexistentes, timeouts, etc.)
-- **Integração com scheduler**: Monitoramento contínuo de relacionamentos BGP junto com outras verificações
-- **Métricas expandidas**: Coleta de métricas detalhadas sobre peers, power ranking e contadores IPv4/IPv6
+### 🔌 API Estendida
+- **8 novos endpoints**: Testes individuais e coletivos de recuperação
+- **Endpoints informativos**: `/alerts/types` e `/alerts/recovery/examples`
+- **Teste completo**: `/test/recovery/all` para validar todos os tipos
 
-#### 📊 Novos Endpoints da API
-- `GET /monitoring/peers/{asn}` - Análise detalhada de peers para ASN específico
-- `POST /monitoring/check-peers` - Execução manual de verificação de peers
+### 🧪 Scripts de Teste
+- **teste_endpoints_recuperacao.sh**: Validação completa de API
+- **teste_deteccao_recuperacao.sh**: Teste de lógica automática
+- **teste_alarmes_recuperacao_pt_br.sh**: Simulação de mensagens
 
-#### 🧪 Validação e Testes
-- **Testes extensivos**: Validação com múltiplos ASNs reais incluindo casos extremos
-- **Taxa de sucesso**: 100% nos testes de funcionalidade
-- **Performance validada**: Tempo de resposta < 1 segundo por consulta
-- **Integração validada**: Funcionamento correto com sistema de alertas e scheduler
+### 📚 Documentação
+- **RESUMO_RECUPERACAO_PT_BR.md**: Documentação técnica completa
+- **ALARMES_PT_BR_TELEGRAM.md**: Exemplos práticos atualizados
+- **RELEASE-NOTES-v1.2.0.md**: Release notes detalhadas
 
-### 🔄 Alterações na Arquitetura
-- **PeerMonitor**: Nova classe para gerenciamento de relacionamentos BGP
-- **API expandida**: Novos endpoints integrados com sistema existente
-- **Scheduler atualizado**: Inclusão de verificações de peers no ciclo de monitoramento
+### ✅ Compatibilidade
+- **Zero breaking changes**: Totalmente compatível com v1.0.1
+- **Funcionalidades mantidas**: Todos os recursos anteriores preservados
+- **Configuração inalterada**: Mesmo arquivo .env e configurações
+
+---
+
+## [1.0.1] - 2025-01-12
+
+### 🔧 Melhorias e Novas Funcionalidades
+- **Monitoramento de Peers ASN-específico**: Nova funcionalidade para análise detalhada de peers BGP para ASNs específicos
+- **Novo endpoint API**: `/monitoring/peers/{asn}` - Endpoint REST para consulta de peers de ASN específico
+- **Análise aprimorada de peers**: Categorização de peers (upstreams, customers, peers) com validação de saúde da rede
+- **Detecção de diversidade de upstreams**: Validação automática da redundância de conexões BGP
+
+### 📈 Validação Completa
+- **Testes realizados**: Validação com múltiplos ASNs (AS267357, AS262993, AS53013, AS61922)
+- **Taxa de sucesso**: 100% nos testes de integração
+- **Exemplo AS267357**: 5 peers detectados (3 upstreams, 1 peer, 1 customer) com status HEALTHY
+
+### 🔄 Otimizações
+- **Código limpo**: Remoção de arquivos desnecessários e cache
+- **Pacote otimizado**: Redução significativa do tamanho do package
+- **Documentação atualizada**: README.md e documentação técnica atualizados
+
+### 📦 Entrega
+- **Package ZIP**: bgp-monitor-v1.0.1.zip pronto para distribuição
+- **Compatibilidade mantida**: Totalmente compatível com versão 1.0.0
+
+---
 
 ## [1.0.0] - 2025-01-12
 

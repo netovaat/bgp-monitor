@@ -1,0 +1,45 @@
+{
+  "alert_types": {
+    "peer_lost": "Peer perdido",
+    "peer_recovered": "Peer recuperado",
+    "upstreams_insufficient": "Upstreams insuficientes",
+    "upstreams_normalized": "Upstreams normalizados",
+    "prefix_missing": "Prefixo ausente",
+    "prefix_restored": "Prefixo restaurado",
+    "latency_high": "Latência alta",
+    "latency_normalized": "Latência normalizada",
+    "instability_detected": "Instabilidade detectada",
+    "instability_resolved": "Instabilidade resolvida",
+    "anomaly_detected": "Anomalia detectada",
+    "anomaly_resolved": "Anomalia resolvida"
+  },
+  "severity_levels": {
+    "critical": "Crítico",
+    "high": "Alto",
+    "medium": "Médio",
+    "low": "Baixo",
+    "info": "Informativo"
+  },
+  "status": {
+    "active": "Ativo",
+    "resolved": "Resolvido",
+    "monitoring": "Monitorando"
+  },
+  "time_units": {
+    "seconds": "segundos",
+    "minutes": "minutos",
+    "hours": "horas",
+    "days": "dias"
+  },
+  "common_phrases": {
+    "detected_at": "Detectado em",
+    "resolved_at": "Resolvido em",
+    "duration": "Duração",
+    "affected_peers": "Peers afetados",
+    "missing_prefixes": "Prefixos ausentes",
+    "latency_value": "Valor da latência",
+    "threshold": "Limite",
+    "current_value": "Valor atual",
+    "previous_value": "Valor anterior"
+  }
+}

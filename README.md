@@ -1,10 +1,10 @@
-# BGP Monitor v1.0.1
+# BGP Monitor v1.2.0
 
 🚀 **Sistema avançado de monitoramento BGP com PostgreSQL e detecção de anomalias estatísticas**
 
 Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos dados BGP, armazene histórico por 1 ano e receba alertas inteligentes. Sistema completo com rate limiting otimizado para não ser bloqueado pela API RIPE.
 
-**✅ Versão 1.0.1 - Funcionalidade de Monitoramento de Peers**
+**✅ Versão 1.2.0 - Sistema Completo com Alertas de Recuperação em PT-BR**
 
 ## 📚 **Documentação Completa**
 
@@ -15,57 +15,31 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 - [🏗️ Arquitetura do Sistema](docs/ARCHITECTURE.md)
 - [🔍 Troubleshooting](docs/TROUBLESHOOTING.md)
 
-## 🆕 **Novidades da v1.0.1**
+## 🆕 **Novidades da v1.2.0**
 
-### 🔗 **Monitoramento de Peers BGP**
-- **Análise de relacionamentos BGP** com classificação automática de upstreams, peers e customers
-- **Novo endpoint REST** `/monitoring/peers/{asn}` para consulta de peers específicos
-- **Detecção de upstreams insuficientes** com alertas automáticos de conectividade
-- **Integração com scheduler** para monitoramento contínuo de relacionamentos BGP
+### 🔄 **Sistema de Alertas de Recuperação**
+- **12 Tipos de Alertas**: 6 tipos de problemas + 6 tipos de recuperação correspondentes
+- **Correlação Inteligente**: Sistema que identifica automaticamente quando problemas são resolvidos
+- **Notificações PT-BR**: Todas as mensagens em português brasileiro
+- **Timeline Completa**: Histórico de problemas e suas respectivas soluções
 
-### 📊 **Análise Avançada de Conectividade**
-- **Classificação inteligente** de relacionamentos baseada em dados RIPE
-- **Análise de saúde da rede** com validação de redundância
-- **Suporte a múltiplos ASNs** para análise comparativa
-- **Métricas de peers** incluindo power ranking e contadores IPv4/IPv6
+### 🇧🇷 **Localização Completa**
+- **Mensagens em Português**: Alertas, notificações e documentação em PT-BR
+- **Terminologia Técnica**: Uso correto de terminologia BGP em português
+- **Exemplos Localizados**: Cenários práticos em contexto brasileiro
+- **Documentação Expandida**: Guias completos em português
 
-### 🚨 **Sistema de Alertas Aprimorado**
-- **Alertas de perda de peers** com severidade baseada no tipo de relacionamento
-- **Monitoramento de upstreams críticos** para detecção de problemas de conectividade
-- **Prevenção de spam** com controle de frequência de alertas
-- **Logs estruturados** para auditoria e troubleshooting
+### 📱 **Melhorias no Telegram**
+- **Formatação Aprimorada**: Mensagens mais claras com emojis contextuais
+- **Agrupamento Lógico**: Alertas relacionados são organizados em sequência
+- **Histórico de Recovery**: Timeline visual de problemas e recuperações
+- **Configuração Granular**: Controle fino sobre tipos de notificação
 
 ### 🔧 **Melhorias Técnicas**
-- **Performance otimizada** com cache inteligente de peers conhecidos
-- **API REST expandida** com novos endpoints de monitoramento
-- **Tratamento robusto de erros** para casos extremos
-- **Documentação completa** com exemplos práticos
-
-## 🆕 **Novidades da v1.0.0**
-
-### 🎯 **Release Inicial Estável**
-- **Sistema completo** de monitoramento BGP pronto para produção
-- **Script de instalação unificado** com validações automáticas e recuperação de erros
-- **Logs coloridos** e informativos durante a instalação
-- **Testes automáticos** de conectividade e funcionalidade
-
-### 📖 **Documentação de Configuração Completa**
-- **`.env.example` documentado** com todas as 25+ variáveis disponíveis
-- **Seções organizadas** por funcionalidade (Database, Cache, BGP, Alertas, etc.)
-- **Comentários explicativos** detalhados para cada configuração
-- **Exemplos práticos** de configuração mínima e avançada
-
-### 🧹 **Estrutura Limpa e Otimizada**
-- **Código consolidado** e estrutura organizizada
-- **Dependências otimizadas** no ambiente virtual
-- **Performance otimizada** no processo de instalação
-- **Arquitetura robusta** para ambiente de produção
-
-### 🔧 **Funcionalidades Técnicas**
-- **Autor**: `netovaat` 
-- **API REST completa** com documentação automática
-- **Sistema de logs** detalhado durante instalação
-- **Validações robustas** de sistema e dependências
+- **Sistema de Correlação**: Identifica automaticamente pares problema/recuperação
+- **Estado Persistente**: Mantém histórico para correlação adequada de alertas
+- **Timeouts Configuráveis**: Diferentes tempos para considerar problemas resolvidos
+- **Processamento Assíncrono**: Alertas não bloqueiam o monitoramento principal
 
 ## ✨ Principais Funcionalidades
 
@@ -81,9 +55,12 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 - **Tipos de Anomalias**: Aumentos/diminuições súbitas, instabilidade
 - **Sensibilidade Configurável**: Thresholds ajustáveis por necessidade
 
-### 🔔 **Sistema de Alertas**
-- **Telegram Integrado**: Alertas em tempo real em português
-- **Severidades**: Crítico 🚨, Aviso ⚠️, Info ℹ️
+### 🔔 **Sistema de Alertas com Recuperação**
+- **12 Tipos de Alertas**: 6 problemas + 6 recuperações correspondentes
+- **Telegram em PT-BR**: Alertas em português brasileiro com emojis contextuais
+- **Correlação Inteligente**: Sistema identifica quando problemas são resolvidos
+- **Severidades**: Crítico 🚨, Aviso ⚠️, Info ℹ️, Recuperação ✅
+- **Timeline Completa**: Histórico de problemas e suas soluções
 - **Contexto Detalhado**: Causas possíveis e recomendações
 - **Relatórios Diários**: Resumo automático de atividades
 
@@ -97,15 +74,16 @@ Monitor em tempo real aproximadamente 50 ASNs, detecte alterações bruscas nos 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    BGP Monitor v1.0                         │
+│                    BGP Monitor v1.2.0                       │
 ├─────────────────────────────────────────────────────────────┤
 │  🌐 API REST (FastAPI)     │  📊 Dashboard & Endpoints     │
 │  ⏰ Scheduler              │  🔄 Coletas Automáticas       │
 │  🎯 ASN Manager            │  ⚙️ Configuração Multi-ASN    │
 │  📈 Anomaly Detector       │  🧮 Análise Estatística       │
+│  🔄 Recovery Monitor       │  ✅ Alertas de Recuperação    │
 │  💾 Database Layer         │  🐘 PostgreSQL + Alembic      │
 │  🔌 RIPE API Client        │  🌍 Rate Limiting Inteligente │
-│  📱 Telegram Alerts        │  🇧🇷 Mensagens em Português     │
+│  📱 Telegram Alerts        │  🇧🇷 Mensagens PT-BR + Emojis  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -526,4 +504,4 @@ Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICEN
 
 ---
 
-**BGP Monitor v1.0.0** - Monitoramento BGP profissional com PostgreSQL 🚀
+**BGP Monitor v1.2.0** - Sistema Completo com Alertas de Recuperação em PT-BR 🚀
